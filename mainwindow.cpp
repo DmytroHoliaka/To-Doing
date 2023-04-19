@@ -14,6 +14,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::show_date() {
     QDate currentDate = QDate::currentDate();
-    ui->date_label->setText(currentDate.toString("dd.MM.yyyy"));
+    ui->date_label->setText("----------------------  "+ currentDate.toString("dd.MM.yyyy") + "  ----------------------");
+
 }
 
