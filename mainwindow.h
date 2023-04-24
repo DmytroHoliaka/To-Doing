@@ -9,6 +9,9 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <QPainter>
+#include <QLineEdit>
+#include <QMessageBox>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,29 +29,17 @@ public:
     void add_progress_mark();
     ~MainWindow();
 
-    QIcon createIcon(Qt::CheckState state) {
-            QPixmap pixmap(16, 16);
-            pixmap.fill(Qt::transparent);
+private slots:
+    void on_pushButton_clicked();
 
-            QPainter painter(&pixmap);
-            painter.setRenderHint(QPainter::Antialiasing, true);
+    void on_pushButton_3_clicked();
 
-            if (state == Qt::Unchecked) {
-                painter.setPen(Qt::red);
-                painter.drawLine(4, 4, 12, 12);
-                painter.drawLine(4, 12, 12, 4);
-            } else if (state == Qt::PartiallyChecked) {
-                painter.setPen(Qt::gray);
-                painter.drawLine(4, 8, 12, 8);
-            } else {
-                painter.setPen(Qt::green);
-                painter.drawLine(4, 8, 12, 8);
-                painter.drawLine(8, 4, 8, 12);
-            }
+    void on_pushButton_2_clicked();
 
-            return QIcon(pixmap);
-        }
+    void on_things_list_itemChanged(QListWidgetItem*);
+
 private:
     Ui::MainWindow *ui;
 };
+
 #endif // MAINWINDOW_H
