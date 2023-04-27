@@ -10,18 +10,47 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     add_progress_mark();
 
 
-    connect(ui->things_list, &QListWidget::itemEntered, this, &MainWindow::on_things_list_itemChanged);
 
+    // ------------------- Tray -------------------
+    tray = new QSystemTrayIcon();
+    tray->setIcon(QIcon("://icon.png"));
+    tray->setVisible(true);
+
+    trayMenu = new QMenu();
+    trayOpen = trayMenu->addAction("Open");
+    trayQuit = trayMenu->addAction("Quit");
+
+    QObject::connect(trayOpen, &QAction::triggered, this, [this](){
+        this->show();
+    });
+
+    QObject::connect(trayQuit, &QAction::triggered, this, [](){
+        QApplication::quit();
+    });
+
+    tray->setContextMenu(trayMenu);
+    // --------------------------------------------
 }
 
 MainWindow::~MainWindow() {
+    delete tray;
+    delete trayMenu;
+    delete trayOpen;
+    delete trayQuit;
     delete ui;
 }
 
+// Дії при закритті вікна
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    event->ignore();
+    this->hide();
+}
+
+// Видалення пустих рядків(коли вони обрані)
 void MainWindow::on_things_list_itemChanged(QListWidgetItem* item)
 {
     if(item->isSelected() && item->text().isEmpty()){
-        ui->things_list->closePersistentEditor(item);
         delete item;
     }
 }
@@ -42,28 +71,25 @@ void MainWindow::add_progress_mark() {
     }
 }
 
-
 void MainWindow::customize_list_font(QString font_name, int size, int block_height) {
     QFont font(font_name, size);
     ui->things_list->setFont(font);
     ui->things_list->setStyleSheet(QString("QListWidget::item { height:%1px; }").arg(block_height));
 }
 
-void MainWindow::on_pushButton_clicked()  // Add
+void MainWindow::on_Add_clicked()  // Add
 {
     QListWidgetItem* item = new QListWidgetItem(ui->things_list);
 
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     item->setCheckState(Qt::Unchecked);
 
-    ui->things_list->setCurrentItem(item); // встановлюємо активність на елемент
+    ui->things_list->setCurrentItem(item);                  // встановлюємо активність на елемент
     ui->things_list->edit(ui->things_list->currentIndex()); // викликаємо метод edit для редагування елемента
-    item->setSelected(true); // виділяємо елемент
+    item->setSelected(true);                                // виділяємо елемент
 }
 
-
-
-void MainWindow::on_pushButton_3_clicked()  // Remove
+void MainWindow::on_Remove_clicked()  // Remove
 {
     QListWidgetItem* item = ui->things_list->currentItem();
     if (item) {
@@ -71,12 +97,12 @@ void MainWindow::on_pushButton_3_clicked()  // Remove
     }
 }
 
-
-
-void MainWindow::on_pushButton_2_clicked()  // Edit
+void MainWindow::on_Edit_clicked()  // Edit
 {
     QListWidgetItem* item = ui->things_list->currentItem();
     if (item) {
         ui->things_list->editItem(item);
     }
 }
+
+
