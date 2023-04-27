@@ -40,6 +40,16 @@ private slots:
 
     void on_Remove_clicked();
 
+    void menuExit();
+
+    void menuAlways_on_top();
+
+    void menuReset_to_default();
+
+    void quitFromTray();
+
+    void openFromTray();
+
     void on_things_list_itemChanged(QListWidgetItem*);
 
 protected:
