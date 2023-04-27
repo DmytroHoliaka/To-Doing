@@ -9,8 +9,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     customize_list_font("Constantia", 17, 60);
     add_progress_mark();
 
-
-
     // ------------------- Tray -------------------
     tray = new QSystemTrayIcon();
     tray->setIcon(QIcon("://icon.png"));
@@ -20,16 +18,38 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     trayOpen = trayMenu->addAction("Open");
     trayQuit = trayMenu->addAction("Quit");
 
-    QObject::connect(trayOpen, &QAction::triggered, this, [this](){
-        this->show();
-    });
-
-    QObject::connect(trayQuit, &QAction::triggered, this, [](){
-        QApplication::quit();
-    });
+    QObject::connect(trayOpen, &QAction::triggered, this, &MainWindow::openFromTray);
+    QObject::connect(trayQuit, &QAction::triggered, this, &MainWindow::quitFromTray);
 
     tray->setContextMenu(trayMenu);
-    // --------------------------------------------
+
+    // ------------------- Menu actions -------------------
+    QObject::connect(ui->actionExit, &QAction::triggered, this, &MainWindow::menuExit);
+    QObject::connect(ui->actionAlways_on_top, &QAction::triggered, this, &MainWindow::menuAlways_on_top);
+    QObject::connect(ui->actionReset_to_default, &QAction::triggered, this, &MainWindow::menuReset_to_default);
+}
+
+void MainWindow::openFromTray() {
+        this->show();
+}
+
+void MainWindow::quitFromTray() {
+    QApplication::quit();
+}
+
+void MainWindow::menuExit() {
+    QApplication::quit();
+}
+
+void MainWindow::menuAlways_on_top() {
+    this->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint); // закріплення вікна
+    this->show();
+}
+
+void MainWindow::menuReset_to_default() {
+    this->setWindowFlags(Qt::Window);
+    this->show();
+
 }
 
 MainWindow::~MainWindow() {
