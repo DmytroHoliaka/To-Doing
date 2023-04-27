@@ -90,7 +90,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="Add">
         <property name="toolTip">
          <string notr="true"/>
         </property>
@@ -116,7 +116,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="Remove">
         <property name="text">
          <string>Remove</string>
         </property>
@@ -139,7 +139,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="Edit">
         <property name="text">
          <string>Edit</string>
         </property>
