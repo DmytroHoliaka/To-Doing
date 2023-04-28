@@ -7,7 +7,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 //    ui->things_list->addItems({"Виконати КДМ", "Написати есе", "Зробити КР",  "Зустріч",  "Математичний аналіз"});
     customize_list_font("Constantia", 17, 60);
-    add_progress_mark();
+
+
+
+
+
 
     // ------------------- Tray -------------------
     tray = new QSystemTrayIcon();
@@ -29,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QObject::connect(ui->actionReset_to_default, &QAction::triggered, this, &MainWindow::menuReset_to_default);
 }
 
+
+// ------------------- Main Buttons -------------------
 void MainWindow::openFromTray() {
         this->show();
 }
@@ -37,6 +43,7 @@ void MainWindow::quitFromTray() {
     QApplication::quit();
 }
 
+// ------------------- Menu -------------------
 void MainWindow::menuExit() {
     QApplication::quit();
 }
@@ -49,16 +56,8 @@ void MainWindow::menuAlways_on_top() {
 void MainWindow::menuReset_to_default() {
     this->setWindowFlags(Qt::Window);
     this->show();
-
 }
-
-MainWindow::~MainWindow() {
-    delete tray;
-    delete trayMenu;
-    delete trayOpen;
-    delete trayQuit;
-    delete ui;
-}
+// ------------------- Menu -------------------
 
 // Дії при закритті вікна
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -82,27 +81,20 @@ void MainWindow::show_date() {
 //    ui->date_label->setStyleSheet("background-color: rgb(211, 157, 124);");
 }
 
-void MainWindow::add_progress_mark() {
-    for (int i = 0; i < ui->things_list->count(); i++) {
-        QListWidgetItem *item = ui->things_list->item(i);
-
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setCheckState(Qt::Unchecked);
-    }
-}
-
 void MainWindow::customize_list_font(QString font_name, int size, int block_height) {
     QFont font(font_name, size);
     ui->things_list->setFont(font);
     ui->things_list->setStyleSheet(QString("QListWidget::item { height:%1px; }").arg(block_height));
 }
 
+// ------------------- Main Buttons -------------------
 void MainWindow::on_Add_clicked()  // Add
 {
     QListWidgetItem* item = new QListWidgetItem(ui->things_list);
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
 
-    item->setFlags(item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-    item->setCheckState(Qt::Unchecked);
+    QIcon icon("://expected.png");
+    item->setIcon(QIcon(icon));
 
     ui->things_list->setCurrentItem(item);                  // встановлюємо активність на елемент
     ui->things_list->edit(ui->things_list->currentIndex()); // викликаємо метод edit для редагування елемента
@@ -125,4 +117,36 @@ void MainWindow::on_Edit_clicked()  // Edit
     }
 }
 
+
+// ------------------- Marking buttons -------------------
+void MainWindow::on_doneTask_clicked() {      // Done
+    QListWidgetItem* item = ui->things_list->currentItem();
+
+    QIcon icon("://done.png");
+    item->setIcon(QIcon(icon));
+}
+
+void MainWindow::on_expectedTask_clicked() {  // Expected
+    QListWidgetItem* item = ui->things_list->currentItem();
+
+    QIcon icon("://expected.png");
+    item->setIcon(QIcon(icon));
+}
+
+
+void MainWindow::on_failedTask_clicked() {    // Failed
+    QListWidgetItem* item = ui->things_list->currentItem();
+
+    QIcon icon("://failed.png");
+    item->setIcon(QIcon(icon));
+}
+
+
+MainWindow::~MainWindow() {
+    delete tray;
+    delete trayMenu;
+    delete trayOpen;
+    delete trayQuit;
+    delete ui;
+}
 

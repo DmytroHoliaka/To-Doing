@@ -30,8 +30,8 @@ public:
 
     void show_date();
     void customize_list_font(QString, int, int);
-    void add_progress_mark();
     ~MainWindow();
+
 
 private slots:
     void on_Add_clicked();
@@ -51,6 +51,12 @@ private slots:
     void openFromTray();
 
     void on_things_list_itemChanged(QListWidgetItem*);
+
+    void on_doneTask_clicked();
+
+    void on_expectedTask_clicked();
+
+    void on_failedTask_clicked();
 
 protected:
     void closeEvent(QCloseEvent*) override;
