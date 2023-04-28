@@ -122,23 +122,29 @@ void MainWindow::on_Edit_clicked()  // Edit
 void MainWindow::on_doneTask_clicked() {      // Done
     QListWidgetItem* item = ui->things_list->currentItem();
 
-    QIcon icon("://done.png");
-    item->setIcon(QIcon(icon));
+    if(item){
+        QIcon icon("://done.png");
+        item->setIcon(QIcon(icon));
+    }
 }
 
 void MainWindow::on_expectedTask_clicked() {  // Expected
     QListWidgetItem* item = ui->things_list->currentItem();
 
+    if(item) {
     QIcon icon("://expected.png");
     item->setIcon(QIcon(icon));
+    }
 }
 
 
 void MainWindow::on_failedTask_clicked() {    // Failed
     QListWidgetItem* item = ui->things_list->currentItem();
 
-    QIcon icon("://failed.png");
-    item->setIcon(QIcon(icon));
+    if(item){
+        QIcon icon("://failed.png");
+        item->setIcon(QIcon(icon));
+    }
 }
 
 
