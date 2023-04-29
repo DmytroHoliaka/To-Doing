@@ -4,16 +4,86 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     show_date();
-
-//    ui->things_list->addItems({"Виконати КДМ", "Написати есе", "Зробити КР",  "Зустріч",  "Математичний аналіз"});
     customize_list_font("Constantia", 17, 60);
+    set_tray_settings();
+
+    task_state.insert("flag_done", '2');
+    task_state.insert("", '1');
+    task_state.insert("flag_failed", '0');
+
+    picture.insert('2', "://done.png");
+    picture.insert('1', "://expected.png");
+    picture.insert('0', "://failed.png");
+
+    flag.insert('2', "flag_done");
+    flag.insert('1', "");
+    flag.insert('0', "flag_failed");
+
+    // ------------------- Menu actions -------------------
+    QObject::connect(ui->actionExit, &QAction::triggered, this, &MainWindow::menuExit);
+    QObject::connect(ui->actionAlways_on_top, &QAction::triggered, this, &MainWindow::menuAlways_on_top);
+    QObject::connect(ui->actionReset_to_default, &QAction::triggered, this, &MainWindow::menuReset_to_default);
+    // ---------------------------------------------------
+
+    getTasksFromFile();
+}
+
+MainWindow::~MainWindow() {
+
+    putTasksIntoFile();
+
+    delete tray;
+    delete trayMenu;
+    delete trayOpen;
+    delete trayQuit;
+    delete ui;
+}
+
+void MainWindow::getTasksFromFile()
+{
+    QFile file("toDoList.txt");
+    if (file.open(QIODevice::ReadOnly)) {
+        QTextStream in(&file);
+
+        while(!in.atEnd()) {
+            QString line = in.readLine();
+            const QChar state = line.at(0);
+
+            QListWidgetItem* item = new QListWidgetItem(line.mid(1), ui->things_list);
+            ui->things_list->addItem(item);
+            item->setFlags(item->flags() | Qt::ItemIsEditable);
+
+            QIcon icon(picture[state]);
+            item->setIcon(icon);
+
+            item->setData(Qt::UserRole, flag[state]);
+        }
+    }
+
+    file.close();
+}
+
+void MainWindow::putTasksIntoFile()
+{
+    QFile file("toDoList.txt");
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::information(0, "Writing error", file.errorString());
+    }
 
 
+    QTextStream out(&file);
+    for (int i = 0; i < ui->things_list->count(); ++i) {
+        QString key = ui->things_list->item(i)->data(Qt::UserRole).toString();
+        qDebug() << "Key: " << key;
+        out << task_state[key] << ui->things_list->item(i)->text() << "\n";
+    }
+
+    file.close();
+}
 
 
-
-
-    // ------------------- Tray -------------------
+// ------------------- Tray -------------------
+void MainWindow::set_tray_settings() {
     tray = new QSystemTrayIcon();
     tray->setIcon(QIcon("://icon.png"));
     tray->setVisible(true);
@@ -26,15 +96,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QObject::connect(trayQuit, &QAction::triggered, this, &MainWindow::quitFromTray);
 
     tray->setContextMenu(trayMenu);
-
-    // ------------------- Menu actions -------------------
-    QObject::connect(ui->actionExit, &QAction::triggered, this, &MainWindow::menuExit);
-    QObject::connect(ui->actionAlways_on_top, &QAction::triggered, this, &MainWindow::menuAlways_on_top);
-    QObject::connect(ui->actionReset_to_default, &QAction::triggered, this, &MainWindow::menuReset_to_default);
 }
 
-
-// ------------------- Main Buttons -------------------
 void MainWindow::openFromTray() {
         this->show();
 }
@@ -90,6 +153,7 @@ void MainWindow::customize_list_font(QString font_name, int size, int block_heig
 // ------------------- Main Buttons -------------------
 void MainWindow::on_Add_clicked()  // Add
 {
+
     QListWidgetItem* item = new QListWidgetItem(ui->things_list);
     item->setFlags(item->flags() | Qt::ItemIsEditable);
 
@@ -124,7 +188,9 @@ void MainWindow::on_doneTask_clicked() {      // Done
 
     if(item){
         QIcon icon("://done.png");
-        item->setIcon(QIcon(icon));
+        item->setIcon(icon);
+
+       item->setData(Qt::UserRole, "flag_done");
     }
 }
 
@@ -132,8 +198,10 @@ void MainWindow::on_expectedTask_clicked() {  // Expected
     QListWidgetItem* item = ui->things_list->currentItem();
 
     if(item) {
-    QIcon icon("://expected.png");
-    item->setIcon(QIcon(icon));
+        QIcon icon("://expected.png");
+        item->setIcon(icon);
+
+        item->setData(Qt::UserRole, "");
     }
 }
 
@@ -143,16 +211,10 @@ void MainWindow::on_failedTask_clicked() {    // Failed
 
     if(item){
         QIcon icon("://failed.png");
-        item->setIcon(QIcon(icon));
+        item->setIcon(icon);
+
+        item->setData(Qt::UserRole, "flag_failed");
     }
 }
 
-
-MainWindow::~MainWindow() {
-    delete tray;
-    delete trayMenu;
-    delete trayOpen;
-    delete trayQuit;
-    delete ui;
-}
 

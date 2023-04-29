@@ -15,7 +15,9 @@
 #include <QMenu>
 #include <QThread>
 #include <QCloseEvent>
-
+#include <QFile>
+#include <QMessageBox>
+#include <QFileInfo>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,6 +32,8 @@ public:
 
     void show_date();
     void customize_list_font(QString, int, int);
+    void getTasksFromFile();
+    void putTasksIntoFile();
     ~MainWindow();
 
 
@@ -58,6 +62,8 @@ private slots:
 
     void on_failedTask_clicked();
 
+    void set_tray_settings();
+
 protected:
     void closeEvent(QCloseEvent*) override;
 
@@ -69,6 +75,10 @@ private:
     QMenu* trayMenu;
     QAction* trayOpen;
     QAction* trayQuit;
+
+    QMap<QString, QChar> task_state;
+    QMap<QChar, QString> picture;
+    QMap<QChar, QString> flag;
 };
 
 #endif // MAINWINDOW_H

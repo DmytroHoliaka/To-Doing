@@ -423,7 +423,7 @@
   </action>
   <action name="actionAlways_on_top">
    <property name="text">
-    <string>Always_on_top</string>
+    <string>Always on top</string>
    </property>
   </action>
  </widget>
