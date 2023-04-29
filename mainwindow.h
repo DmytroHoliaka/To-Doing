@@ -18,6 +18,8 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QFileInfo>
+#include <QDir>
+#include <QCoreApplication>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,7 +32,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
 
-    void show_date();
+    QString get_date();
     void customize_list_font(QString, int, int);
     void getTasksFromFile();
     void putTasksIntoFile();
@@ -64,10 +66,18 @@ private slots:
 
     void set_tray_settings();
 
+    void on_previousDay_clicked();
+
+    void on_nextDay_clicked();
+
 protected:
     void closeEvent(QCloseEvent*) override;
 
 private:
+    int daysCounter;
+    QString currentDay;
+    QString space;
+    QString basePath;
     Ui::MainWindow *ui;
     QSystemTrayIcon *mSystemTrayIcon;
 

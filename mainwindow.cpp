@@ -3,7 +3,16 @@
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    show_date();
+
+    basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
+
+    daysCounter = 0;
+    space = "----------------------";
+    currentDay = get_date();
+    ui->date_label->setText(space + "  " + currentDay + "  " + space);
+
+
+
     customize_list_font("Constantia", 17, 60);
     set_tray_settings();
 
@@ -41,7 +50,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::getTasksFromFile()
 {
-    QFile file("toDoList.txt");
+    QFile file(basePath + currentDay + ".txt");
     if (file.open(QIODevice::ReadOnly)) {
         QTextStream in(&file);
 
@@ -65,16 +74,21 @@ void MainWindow::getTasksFromFile()
 
 void MainWindow::putTasksIntoFile()
 {
-    QFile file("toDoList.txt");
+    QDir directory(QCoreApplication::applicationDirPath());
+    QString folderName = "tasks_base";
+    if (!directory.exists(folderName)) {
+        directory.mkpath(folderName);
+    }
+
+    QFile file(basePath + currentDay + ".txt");
     if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox::information(0, "Writing error", file.errorString());
     }
 
-
     QTextStream out(&file);
     for (int i = 0; i < ui->things_list->count(); ++i) {
         QString key = ui->things_list->item(i)->data(Qt::UserRole).toString();
-        qDebug() << "Key: " << key;
+
         out << task_state[key] << ui->things_list->item(i)->text() << "\n";
     }
 
@@ -137,11 +151,8 @@ void MainWindow::on_things_list_itemChanged(QListWidgetItem* item)
     }
 }
 
-void MainWindow::show_date() {
-    QDate currentDate = QDate::currentDate();
-    QString space = "----------------------";
-    ui->date_label->setText(space + "  " + currentDate.toString("dd.MM.yyyy") + "  " + space);
-//    ui->date_label->setStyleSheet("background-color: rgb(211, 157, 124);");
+QString MainWindow::get_date() {
+    return QDate::currentDate().addDays(daysCounter).toString("dd.MM.yyyy");
 }
 
 void MainWindow::customize_list_font(QString font_name, int size, int block_height) {
@@ -217,4 +228,28 @@ void MainWindow::on_failedTask_clicked() {    // Failed
     }
 }
 
+
+
+void MainWindow::on_previousDay_clicked()
+{
+    putTasksIntoFile();
+    ui->things_list->clear();
+
+    daysCounter -= 1;
+    currentDay = get_date();
+    ui->date_label->setText(space + "  " + currentDay + "  " + space);
+    getTasksFromFile();
+}
+
+
+void MainWindow::on_nextDay_clicked()
+{
+    putTasksIntoFile();
+    ui->things_list->clear();
+
+    daysCounter += 1;
+    currentDay = get_date();
+    ui->date_label->setText(space + "  " + currentDay + "  " + space);
+    getTasksFromFile();
+}
 

@@ -245,6 +245,13 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="QPushButton" name="previousDay">
+        <property name="text">
+         <string>Previous day</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_5">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -379,6 +386,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="nextDay">
+        <property name="text">
+         <string>Next day</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
