@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>843</width>
-    <height>645</height>
+    <height>648</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -179,7 +179,7 @@ color: black;</string>
            <set>Qt::AlignCenter</set>
           </property>
           <property name="margin">
-           <number>10</number>
+           <number>15</number>
           </property>
          </widget>
         </item>
@@ -412,12 +412,9 @@ color: black;</string>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>10</width>
+              <width>40</width>
               <height>20</height>
              </size>
             </property>
@@ -552,6 +549,22 @@ color: black;</string>
            <number>0</number>
           </property>
           <item>
+           <spacer name="horizontalSpacer_11">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>10</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QPushButton" name="previousDay">
             <property name="text">
              <string/>
@@ -570,22 +583,6 @@ color: black;</string>
              <bool>true</bool>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_11">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>10</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
           <item>
            <spacer name="horizontalSpacer_5">
