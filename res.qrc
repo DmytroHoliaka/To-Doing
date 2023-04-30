@@ -1,8 +1,13 @@
 <RCC>
     <qresource prefix="/">
         <file>icon.png</file>
-        <file>failed.png</file>
-        <file>expected.png</file>
         <file>done.png</file>
+        <file>expected.png</file>
+        <file>failed.png</file>
+    </qresource>
+    <qresource prefix="/draft">
+        <file>done.png</file>
+        <file>expected.png</file>
+        <file>failed.png</file>
     </qresource>
 </RCC>
