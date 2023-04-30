@@ -3,6 +3,8 @@
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    this->setWindowTitle("ToDoing");
+    this->setWindowIcon(QIcon(":/icon.png"));
 
     basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
 
