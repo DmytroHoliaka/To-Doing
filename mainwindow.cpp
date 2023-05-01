@@ -43,11 +43,12 @@ MainWindow::~MainWindow() {
 
     putTasksIntoFile();
 
+    delete ui;
+    delete mSystemTrayIcon;
     delete tray;
     delete trayMenu;
     delete trayOpen;
     delete trayQuit;
-    delete ui;
 }
 
 void MainWindow::getTasksFromFile()
