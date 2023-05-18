@@ -5,6 +5,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     trayObj.makeConections(this);
 
     ui->setupUi(this);
+
+    topPanelObj.setExit(ui->actionExit);
+    topPanelObj.setTop(ui->actionAlways_on_top);
+    topPanelObj.setReset(ui->actionReset_to_default);
+    topPanelObj.makeConections(this);
+
+
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
 
@@ -30,9 +37,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     flag.insert('0', "flag_failed");
 
     // ------------------- Menu actions -------------------
-    QObject::connect(ui->actionExit, &QAction::triggered, this, &MainWindow::menuExit);
-    QObject::connect(ui->actionAlways_on_top, &QAction::triggered, this, &MainWindow::menuAlways_on_top);
-    QObject::connect(ui->actionReset_to_default, &QAction::triggered, this, &MainWindow::menuReset_to_default);
+
     // ---------------------------------------------------
 
     getTasksFromFile();
@@ -104,19 +109,17 @@ void Tray::quitFromTray() {
 }
 
 // ------------------- Menu -------------------
-void MainWindow::menuExit() {
-    QApplication::quit();
+
+void TopPanel::menuAlways_on_top(MainWindow* mw) {
+    mw->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint); // закріплення вікна
+    mw->show();
 }
 
-void MainWindow::menuAlways_on_top() {
-    this->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint); // закріплення вікна
-    this->show();
+void TopPanel::menuReset_to_default(MainWindow* mw) {
+    mw->setWindowFlags(Qt::Window);
+    mw->show();
 }
 
-void MainWindow::menuReset_to_default() {
-    this->setWindowFlags(Qt::Window);
-    this->show();
-}
 // ------------------- Menu -------------------
 
 // Дії при закритті вікна
