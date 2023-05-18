@@ -28,6 +28,7 @@ QT_END_NAMESPACE
 
 class MainWindow;
 
+
 class Tray : public QObject
 {
     Q_OBJECT
@@ -75,8 +76,28 @@ public:
 };
 
 
+class TopPanel : public QObject
+{
+    Q_OBJECT
+private:
+
+public:
+    TopPanel()
+    {
+
+    }
+
+    void makeConections(QAction* exitMenu)
+    {
+
+    }
+};
+
+
+
 class MainWindow : public QMainWindow
 {
+    friend class TopPanel;
     Q_OBJECT
 
 private:
@@ -87,6 +108,7 @@ private:
     Ui::MainWindow *ui;
 
     Tray trayObj;
+    TopPanel topPanelObj;
 
     QMap<QString, QChar> task_state;
     QMap<QChar, QString> picture;
@@ -131,5 +153,4 @@ protected:
     void closeEvent(QCloseEvent*) override;
 
 };
-
 #endif // MAINWINDOW_H

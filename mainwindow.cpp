@@ -5,6 +5,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     trayObj.makeConections(this);
 
     ui->setupUi(this);
+
+    QAction* exitMenu = ui->actionExit;
+    topPanelObj.makeConections(exitMenu);
+
+
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
 
@@ -30,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     flag.insert('0', "flag_failed");
 
     // ------------------- Menu actions -------------------
-    QObject::connect(ui->actionExit, &QAction::triggered, this, &MainWindow::menuExit);
     QObject::connect(ui->actionAlways_on_top, &QAction::triggered, this, &MainWindow::menuAlways_on_top);
     QObject::connect(ui->actionReset_to_default, &QAction::triggered, this, &MainWindow::menuReset_to_default);
     // ---------------------------------------------------
