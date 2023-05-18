@@ -18,9 +18,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     customize_list_font("Constantia", 17, 60);
 
     Tray tray;
-    tray.set_tray_settings();
-
-
 
     task_state.insert("flag_done", '2');
     task_state.insert("", '1');
@@ -99,28 +96,14 @@ void MainWindow::putTasksIntoFile()
 
 
 // ------------------- Tray -------------------
-void Tray::set_tray_settings() {
-    tray = new QSystemTrayIcon();
-    tray->setIcon(QIcon("://icon.png"));
-    tray->setVisible(true);
-
-    trayMenu = new QMenu();
-    trayOpen = trayMenu->addAction("Open");
-    trayQuit = trayMenu->addAction("Quit");
-
-//    QObject::connect(trayOpen, &QAction::triggered, this, &Tray::openFromTray);
-    QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
-
-    tray->setContextMenu(trayMenu);
-}
 
 //void Tray::openFromTray() {
 //        this->show();
 //}
 
-void Tray::quitFromTray() {
-    QApplication::quit();
-}
+//void Tray::quitFromTray() {
+//    QApplication::quit();
+//}
 
 // ------------------- Menu -------------------
 void MainWindow::menuExit() {

@@ -93,20 +93,26 @@ private:
     QAction* trayOpen;
     QAction* trayQuit;
 
-public slots:
-    void quitFromTray();
+//public slots:
+//    void quitFromTray();
 //    void openFromTray();
-    void set_tray_settings();
+//    void set_tray_settings();
 
 public:
     Tray()
     {
-        mSystemTrayIcon = new QSystemTrayIcon;
+        tray = new QSystemTrayIcon();
+        tray->setIcon(QIcon("://icon.png"));
+        tray->setVisible(true);
 
-        tray = new QSystemTrayIcon;
-        trayMenu = new QMenu;
-        trayOpen = new QAction;
-        trayQuit = new QAction;
+        trayMenu = new QMenu();
+        trayOpen = trayMenu->addAction("Open");
+        trayQuit = trayMenu->addAction("Quit");
+
+//        QObject::connect(trayOpen, &QAction::triggered, this, &Tray::openFromTray);
+//        QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
+
+        tray->setContextMenu(trayMenu);
     }
    ~Tray()
    {
