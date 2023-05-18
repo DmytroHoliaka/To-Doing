@@ -32,8 +32,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow() = default;
-    MainWindow(Tray& tray, QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr);
 
     QString get_date();
     void customize_list_font(QString, int, int);
@@ -82,7 +81,7 @@ private:
     QMap<QChar, QString> flag;
 };
 
-class Tray : public MainWindow
+class Tray : public QObject
 {
     Q_OBJECT
 
@@ -94,21 +93,30 @@ private:
     QAction* trayOpen;
     QAction* trayQuit;
 
-//public slots:
-//    void quitFromTray();
+public slots:
+    void quitFromTray();
 //    void openFromTray();
-//    void set_tray_settings();
+    void set_tray_settings();
 
 public:
-//    ~Tray()
-//    {
-//        qDebug() << "From Dtor";
-//        delete mSystemTrayIcon;
-//        delete tray;
-//        delete trayMenu;
-//        delete trayOpen;
-//        delete trayQuit;
-//    }
+    Tray()
+    {
+        mSystemTrayIcon = new QSystemTrayIcon;
+
+        tray = new QSystemTrayIcon;
+        trayMenu = new QMenu;
+        trayOpen = new QAction;
+        trayQuit = new QAction;
+    }
+   ~Tray()
+   {
+       qDebug() << "From Dtor";
+       delete mSystemTrayIcon;
+       delete tray;
+       delete trayMenu;
+       delete trayOpen;
+       delete trayQuit;
+   }
 };
 
 #endif // MAINWINDOW_H
