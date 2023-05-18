@@ -39,10 +39,9 @@ private:
     QAction* trayOpen;
     QAction* trayQuit;
 
-public slots:
+private slots:
     void quitFromTray();
     void openFromTray(MainWindow*);
-
 
 public:
     Tray()
@@ -68,9 +67,9 @@ public:
 
    ~Tray()
    {
-       qDebug() << "From Dtor";
-
        delete tray;
+       delete trayOpen;
+       delete trayQuit;
        delete trayMenu;
    }
 };
@@ -79,17 +78,66 @@ public:
 class TopPanel : public QObject
 {
     Q_OBJECT
+
 private:
+    QAction* exit;
+    QAction* top;
+    QAction* reset;
+
+private slots:
+    void menuAlways_on_top(MainWindow* mw);
+
+    void menuReset_to_default(MainWindow* mw);
 
 public:
     TopPanel()
     {
-
+        this->exit = nullptr;
+        this->top = nullptr;
+        this->reset = nullptr;
     }
 
-    void makeConections(QAction* exitMenu)
+    TopPanel(QAction* exitMenu, QAction* topMenu, QAction* resetMenu)
     {
+        this->exit = exitMenu;
+        this->top = topMenu;
+        this->reset = resetMenu;
+    }
 
+    void setExit(QAction* exitMenu)
+    {
+        this->exit = exitMenu;
+    }
+
+    void setTop(QAction* topMenu)
+    {
+        this->top = topMenu;
+    }
+
+    void setReset(QAction* resetMenu)
+    {
+        this->reset = resetMenu;
+    }
+
+    void makeConections(MainWindow* mw)
+    {
+        QObject::connect(this->exit, &QAction::triggered, this, [](){
+             QApplication::quit();
+        });
+
+        QObject::connect(this->top, &QAction::triggered, this, [this, mw](){
+            this->menuAlways_on_top(mw);
+        });
+        QObject::connect(this->reset, &QAction::triggered, this, [this, mw](){
+            this->menuReset_to_default(mw);
+        });
+    }
+
+    ~TopPanel()
+    {
+        delete exit;
+        delete top;
+        delete reset;
     }
 };
 
@@ -130,12 +178,6 @@ private slots:
     void on_Edit_clicked();
 
     void on_Remove_clicked();
-
-    void menuExit();
-
-    void menuAlways_on_top();
-
-    void menuReset_to_default();
 
     void on_things_list_itemChanged(QListWidgetItem*);
 
