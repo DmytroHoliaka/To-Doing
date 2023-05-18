@@ -4,7 +4,9 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     trayObj.makeConections(this);
 
+
     ui->setupUi(this);
+    date.print(ui->date_label);
 
     topPanelObj.setExit(ui->actionExit);
     topPanelObj.setTop(ui->actionAlways_on_top);
@@ -17,10 +19,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
 
-    daysCounter = 0;
-    space = "----------------------";
-    currentDay = get_date();
-    ui->date_label->setText(space + "  " + currentDay + "  " + space);
+//    daysCounter = 0;
+//    space = "----------------------";
+//    currentDay = get_date();
+//    ui->date_label->setText(space + "  " + currentDay + "  " + space);
+
 
     customize_list_font("Constantia", 17, 60);
 
@@ -43,6 +46,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     getTasksFromFile();
 }
 
+void Date::print(QLabel* dateLabel)
+{
+    dateLabel->setText(this->space + "  " + this->currentDay + "  " + this->space);
+}
+
 MainWindow::~MainWindow() {
 
     putTasksIntoFile();
@@ -52,7 +60,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::getTasksFromFile()
 {
-    QFile file(basePath + currentDay + ".txt");
+    QFile file(basePath + date.getCurrentDay() + ".txt");
     if (file.open(QIODevice::ReadOnly)) {
         QTextStream in(&file);
 
@@ -82,7 +90,7 @@ void MainWindow::putTasksIntoFile()
         directory.mkpath(folderName);
     }
 
-    QFile file(basePath + currentDay + ".txt");
+    QFile file(basePath + date.getCurrentDay() + ".txt");
     if (!file.open(QIODevice::WriteOnly)) {
         QMessageBox::information(0, "Writing error", file.errorString());
     }
@@ -135,10 +143,6 @@ void MainWindow::on_things_list_itemChanged(QListWidgetItem* item)
     if(item->isSelected() && item->text().isEmpty()){
         delete item;
     }
-}
-
-QString MainWindow::get_date() {
-    return QDate::currentDate().addDays(daysCounter).toString("dd.MM.yyyy");
 }
 
 void MainWindow::customize_list_font(QString font_name, int size, int block_height) {
@@ -214,16 +218,14 @@ void MainWindow::on_failedTask_clicked() {    // Failed
     }
 }
 
-
-
 void MainWindow::on_previousDay_clicked()
 {
     putTasksIntoFile();
     ui->things_list->clear();
 
-    daysCounter -= 1;
-    currentDay = get_date();
-    ui->date_label->setText(space + "  " + currentDay + "  " + space);
+    --date;
+    date.recount();
+    date.print(ui->date_label);
     getTasksFromFile();
 }
 
@@ -233,9 +235,9 @@ void MainWindow::on_nextDay_clicked()
     putTasksIntoFile();
     ui->things_list->clear();
 
-    daysCounter += 1;
-    currentDay = get_date();
-    ui->date_label->setText(space + "  " + currentDay + "  " + space);
+    ++date;
+    date.recount();
+    date.print(ui->date_label);
     getTasksFromFile();
 }
 

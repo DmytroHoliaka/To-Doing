@@ -141,22 +141,86 @@ public:
     }
 };
 
-
-
-class MainWindow : public QMainWindow
+class Date
 {
-    friend class TopPanel;
-    Q_OBJECT
-
+    friend class MainWindow;
 private:
     int daysCounter;
     QString currentDay;
     QString space;
+
+public:
+    Date()
+    {
+        this->daysCounter = 0;
+        this->space = "----------------------";
+        this->currentDay = this->get_date();
+    }
+
+    void print(QLabel* dataLabel);
+
+    QString get_date() {
+        return QDate::currentDate().addDays(this->daysCounter).toString("dd.MM.yyyy");
+    }
+
+    int getDaysCounter()
+    {
+        return this->daysCounter;
+    }
+
+    QString getCurrentDay()
+    {
+        return this->currentDay;
+    }
+
+    void recount()
+    {
+        this->currentDay = this->get_date();
+    }
+
+    void setDaysCounter(int count)
+    {
+        this->daysCounter = count;
+    }
+
+    Date operator++()
+    {
+        ++this->daysCounter;
+        return *this;
+    }
+
+    Date operator--()
+    {
+        --this->daysCounter;
+         return *this;
+    }
+
+    Date operator++(int)
+    {
+        Date temp = *this;
+        ++this->daysCounter;
+        return *this;
+    }
+
+    Date operator--(int)
+    {
+        Date temp = *this;
+        --this->daysCounter;
+        return *this;
+    }
+};
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+private:
     QString basePath;
     Ui::MainWindow *ui;
 
     Tray trayObj;
     TopPanel topPanelObj;
+    Date date;
 
     QMap<QString, QChar> task_state;
     QMap<QChar, QString> picture;
@@ -165,7 +229,6 @@ private:
 public:
     MainWindow(QWidget *parent = nullptr);
 
-    QString get_date();
     void customize_list_font(QString, int, int);
     void getTasksFromFile();
     void putTasksIntoFile();
@@ -195,4 +258,5 @@ protected:
     void closeEvent(QCloseEvent*) override;
 
 };
+
 #endif // MAINWINDOW_H
