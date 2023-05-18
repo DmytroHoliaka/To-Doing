@@ -25,12 +25,15 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class Tray;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow() = default;
+    MainWindow(Tray& tray, QWidget *parent = nullptr);
 
     QString get_date();
     void customize_list_font(QString, int, int);
@@ -52,10 +55,6 @@ private slots:
 
     void menuReset_to_default();
 
-    void quitFromTray();
-
-    void openFromTray();
-
     void on_things_list_itemChanged(QListWidgetItem*);
 
     void on_doneTask_clicked();
@@ -63,8 +62,6 @@ private slots:
     void on_expectedTask_clicked();
 
     void on_failedTask_clicked();
-
-    void set_tray_settings();
 
     void on_previousDay_clicked();
 
@@ -79,6 +76,17 @@ private:
     QString space;
     QString basePath;
     Ui::MainWindow *ui;
+
+    QMap<QString, QChar> task_state;
+    QMap<QChar, QString> picture;
+    QMap<QChar, QString> flag;
+};
+
+class Tray : public MainWindow
+{
+    Q_OBJECT
+
+private:
     QSystemTrayIcon *mSystemTrayIcon;
 
     QSystemTrayIcon* tray;
@@ -86,9 +94,21 @@ private:
     QAction* trayOpen;
     QAction* trayQuit;
 
-    QMap<QString, QChar> task_state;
-    QMap<QChar, QString> picture;
-    QMap<QChar, QString> flag;
+//public slots:
+//    void quitFromTray();
+//    void openFromTray();
+//    void set_tray_settings();
+
+public:
+//    ~Tray()
+//    {
+//        qDebug() << "From Dtor";
+//        delete mSystemTrayIcon;
+//        delete tray;
+//        delete trayMenu;
+//        delete trayOpen;
+//        delete trayQuit;
+//    }
 };
 
 #endif // MAINWINDOW_H

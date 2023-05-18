@@ -2,8 +2,10 @@
 
 
 int main(int argc, char *argv[]) {
+
     QApplication app(argc, argv);
-    MainWindow w;
+    Tray tray;
+    MainWindow w(tray);
     w.show();
 
     return app.exec();

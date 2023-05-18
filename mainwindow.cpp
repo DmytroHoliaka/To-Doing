@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(Tray& tray, QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
@@ -16,7 +16,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 
     customize_list_font("Constantia", 17, 60);
-    set_tray_settings();
+
+//    Tray tray;
+//    tray.set_tray_settings();
 
     task_state.insert("flag_done", '2');
     task_state.insert("", '1');
@@ -44,11 +46,6 @@ MainWindow::~MainWindow() {
     putTasksIntoFile();
 
     delete ui;
-    delete mSystemTrayIcon;
-    delete tray;
-    delete trayMenu;
-    delete trayOpen;
-    delete trayQuit;
 }
 
 void MainWindow::getTasksFromFile()
@@ -100,28 +97,28 @@ void MainWindow::putTasksIntoFile()
 
 
 // ------------------- Tray -------------------
-void MainWindow::set_tray_settings() {
-    tray = new QSystemTrayIcon();
-    tray->setIcon(QIcon("://icon.png"));
-    tray->setVisible(true);
+//void Tray::set_tray_settings() {
+//    tray = new QSystemTrayIcon();
+//    tray->setIcon(QIcon("://icon.png"));
+//    tray->setVisible(true);
 
-    trayMenu = new QMenu();
-    trayOpen = trayMenu->addAction("Open");
-    trayQuit = trayMenu->addAction("Quit");
+//    trayMenu = new QMenu();
+//    trayOpen = trayMenu->addAction("Open");
+//    trayQuit = trayMenu->addAction("Quit");
 
-    QObject::connect(trayOpen, &QAction::triggered, this, &MainWindow::openFromTray);
-    QObject::connect(trayQuit, &QAction::triggered, this, &MainWindow::quitFromTray);
+//    QObject::connect(trayOpen, &QAction::triggered, this, &Tray::openFromTray);
+//    QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
 
-    tray->setContextMenu(trayMenu);
-}
+//    tray->setContextMenu(trayMenu);
+//}
 
-void MainWindow::openFromTray() {
-        this->show();
-}
+//void Tray::openFromTray() {
+//        this->show();
+//}
 
-void MainWindow::quitFromTray() {
-    QApplication::quit();
-}
+//void Tray::quitFromTray() {
+//    QApplication::quit();
+//}
 
 // ------------------- Menu -------------------
 void MainWindow::menuExit() {
