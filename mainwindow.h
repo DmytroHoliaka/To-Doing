@@ -210,6 +210,28 @@ public:
     }
 };
 
+class MainButtonManager
+{
+
+private:
+    QListWidgetItem* item;
+
+public:
+    void on_Add_clicked(QListWidget* list);
+    void on_Edit_clicked(QListWidget* list);
+    void on_Remove_clicked(QListWidget* list);
+
+    void fillCurrentItem(QListWidget* list);
+    void on_things_list_itemChanged(QListWidgetItem*);
+
+    void makeConections(QPushButton* Add, QListWidget* list);
+
+    ~MainButtonManager()
+    {
+        delete item;
+    }
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -221,6 +243,7 @@ private:
     Tray trayObj;
     TopPanel topPanelObj;
     Date date;
+    MainButtonManager manager;
 
     QMap<QString, QChar> task_state;
     QMap<QChar, QString> picture;
@@ -236,14 +259,6 @@ public:
 
 
 private slots:
-    void on_Add_clicked();
-
-    void on_Edit_clicked();
-
-    void on_Remove_clicked();
-
-    void on_things_list_itemChanged(QListWidgetItem*);
-
     void on_doneTask_clicked();
 
     void on_expectedTask_clicked();
@@ -253,6 +268,7 @@ private slots:
     void on_previousDay_clicked();
 
     void on_nextDay_clicked();
+
 
 protected:
     void closeEvent(QCloseEvent*) override;

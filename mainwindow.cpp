@@ -17,12 +17,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
 
+
+    QObject::connect(ui->Add, &QPushButton::clicked, this, [this](){
+        this->manager.on_Add_clicked(ui->things_list);
+    });
     basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
 
-//    daysCounter = 0;
-//    space = "----------------------";
-//    currentDay = get_date();
-//    ui->date_label->setText(space + "  " + currentDay + "  " + space);
 
 
     customize_list_font("Constantia", 17, 60);
@@ -137,49 +137,10 @@ void MainWindow::closeEvent(QCloseEvent* event)
     this->hide();
 }
 
-// Видалення пустих рядків(коли вони обрані)
-void MainWindow::on_things_list_itemChanged(QListWidgetItem* item)
-{
-    if(item->isSelected() && item->text().isEmpty()){
-        delete item;
-    }
-}
-
 void MainWindow::customize_list_font(QString font_name, int size, int block_height) {
     QFont font(font_name, size);
     ui->things_list->setFont(font);
     ui->things_list->setStyleSheet(QString("QListWidget::item { height:%1px; }").arg(block_height));
-}
-
-// ------------------- Main Buttons -------------------
-void MainWindow::on_Add_clicked()  // Add
-{
-
-    QListWidgetItem* item = new QListWidgetItem(ui->things_list);
-    item->setFlags(item->flags() | Qt::ItemIsEditable);
-
-    QIcon icon("://expected.png");
-    item->setIcon(QIcon(icon));
-
-    ui->things_list->setCurrentItem(item);                  // встановлюємо активність на елемент
-    ui->things_list->edit(ui->things_list->currentIndex()); // викликаємо метод edit для редагування елемента
-    item->setSelected(true);                                // виділяємо елемент
-}
-
-void MainWindow::on_Remove_clicked()  // Remove
-{
-    QListWidgetItem* item = ui->things_list->currentItem();
-    if (item) {
-        delete item;
-    }
-}
-
-void MainWindow::on_Edit_clicked()  // Edit
-{
-    QListWidgetItem* item = ui->things_list->currentItem();
-    if (item) {
-        ui->things_list->editItem(item);
-    }
 }
 
 
@@ -240,4 +201,49 @@ void MainWindow::on_nextDay_clicked()
     date.print(ui->date_label);
     getTasksFromFile();
 }
+
+
+// ------------------- Main Buttons -------------------
+
+void MainButtonManager::on_Add_clicked(QListWidget* list)  // Add
+{
+    this->item = new QListWidgetItem(list);
+    this->item->setFlags(item->flags() | Qt::ItemIsEditable);
+
+    QIcon icon("://expected.png");
+    this->item->setIcon(QIcon(icon));
+
+    list->setCurrentItem(item);                  // встановлюємо активність на елемент
+    list->edit(list->currentIndex()); // викликаємо метод edit для редагування елемента
+    this->item->setSelected(true);                                // виділяємо елемент
+}
+
+//void MainButtonManager::on_Remove_clicked(QListWidget* list)  // Remove
+//{
+//    this->fillCurrentItem(list);
+//    if (item) {
+//        delete item;
+//    }
+//}
+
+//void MainButtonManager::on_Edit_clicked(QListWidget* list)  // Edit
+//{
+//    this->fillCurrentItem(list);
+//    if (item) {
+//        list->editItem(item);
+//    }
+//}
+
+//void MainButtonManager::fillCurrentItem(QListWidget* list)
+//{
+//    this->item = list->currentItem();
+//}
+
+//// Видалення пустих рядків(коли вони обрані)
+//void MainButtonManager::on_things_list_itemChanged(QListWidgetItem* item)
+//{
+//    if(item->isSelected() && item->text().isEmpty()){
+//        delete item;
+//    }
+//}
 
