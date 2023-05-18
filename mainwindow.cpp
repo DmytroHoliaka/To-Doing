@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
+    trayObj.makeConections(this);
+
     ui->setupUi(this);
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
@@ -13,11 +15,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     currentDay = get_date();
     ui->date_label->setText(space + "  " + currentDay + "  " + space);
 
-
-
     customize_list_font("Constantia", 17, 60);
-
-    Tray tray;
 
     task_state.insert("flag_done", '2');
     task_state.insert("", '1');
@@ -97,13 +95,13 @@ void MainWindow::putTasksIntoFile()
 
 // ------------------- Tray -------------------
 
-//void Tray::openFromTray() {
-//        this->show();
-//}
+void Tray::openFromTray(MainWindow* mw) {
+    mw->show();
+}
 
-//void Tray::quitFromTray() {
-//    QApplication::quit();
-//}
+void Tray::quitFromTray() {
+    QApplication::quit();
+}
 
 // ------------------- Menu -------------------
 void MainWindow::menuExit() {

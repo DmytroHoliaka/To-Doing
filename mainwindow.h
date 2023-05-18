@@ -25,11 +25,72 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class Tray;
+
+class MainWindow;
+
+class Tray : public QObject
+{
+    Q_OBJECT
+
+private:
+    QSystemTrayIcon* tray;
+    QMenu* trayMenu;
+    QAction* trayOpen;
+    QAction* trayQuit;
+
+public slots:
+    void quitFromTray();
+    void openFromTray(MainWindow*);
+
+
+public:
+    Tray()
+    {
+        tray = new QSystemTrayIcon();
+        tray->setIcon(QIcon("://icon.png"));
+        tray->setVisible(true);
+
+        trayMenu = new QMenu();
+        trayOpen = trayMenu->addAction("Open");
+        trayQuit = trayMenu->addAction("Quit");
+
+        tray->setContextMenu(trayMenu);
+    }
+
+    void makeConections(MainWindow* mw)
+    {
+        QObject::connect(trayOpen, &QAction::triggered, this, [this, mw]() {
+            this->openFromTray(mw);
+        });
+        QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
+    }
+
+   ~Tray()
+   {
+       qDebug() << "From Dtor";
+
+       delete tray;
+       delete trayMenu;
+   }
+};
+
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
+private:
+    int daysCounter;
+    QString currentDay;
+    QString space;
+    QString basePath;
+    Ui::MainWindow *ui;
+
+    Tray trayObj;
+
+    QMap<QString, QChar> task_state;
+    QMap<QChar, QString> picture;
+    QMap<QChar, QString> flag;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -69,60 +130,6 @@ private slots:
 protected:
     void closeEvent(QCloseEvent*) override;
 
-private:
-    int daysCounter;
-    QString currentDay;
-    QString space;
-    QString basePath;
-    Ui::MainWindow *ui;
-
-    QMap<QString, QChar> task_state;
-    QMap<QChar, QString> picture;
-    QMap<QChar, QString> flag;
-};
-
-class Tray : public QObject
-{
-    Q_OBJECT
-
-private:
-    QSystemTrayIcon *mSystemTrayIcon;
-
-    QSystemTrayIcon* tray;
-    QMenu* trayMenu;
-    QAction* trayOpen;
-    QAction* trayQuit;
-
-//public slots:
-//    void quitFromTray();
-//    void openFromTray();
-//    void set_tray_settings();
-
-public:
-    Tray()
-    {
-        tray = new QSystemTrayIcon();
-        tray->setIcon(QIcon("://icon.png"));
-        tray->setVisible(true);
-
-        trayMenu = new QMenu();
-        trayOpen = trayMenu->addAction("Open");
-        trayQuit = trayMenu->addAction("Quit");
-
-//        QObject::connect(trayOpen, &QAction::triggered, this, &Tray::openFromTray);
-//        QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
-
-        tray->setContextMenu(trayMenu);
-    }
-   ~Tray()
-   {
-       qDebug() << "From Dtor";
-       delete mSystemTrayIcon;
-       delete tray;
-       delete trayMenu;
-       delete trayOpen;
-       delete trayQuit;
-   }
 };
 
 #endif // MAINWINDOW_H
