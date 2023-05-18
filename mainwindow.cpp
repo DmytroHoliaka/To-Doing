@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
+    trayObj.makeConections(this);
+
     ui->setupUi(this);
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
@@ -13,10 +15,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     currentDay = get_date();
     ui->date_label->setText(space + "  " + currentDay + "  " + space);
 
-
-
     customize_list_font("Constantia", 17, 60);
-    set_tray_settings();
 
     task_state.insert("flag_done", '2');
     task_state.insert("", '1');
@@ -44,11 +43,6 @@ MainWindow::~MainWindow() {
     putTasksIntoFile();
 
     delete ui;
-    delete mSystemTrayIcon;
-    delete tray;
-    delete trayMenu;
-    delete trayOpen;
-    delete trayQuit;
 }
 
 void MainWindow::getTasksFromFile()
@@ -100,26 +94,12 @@ void MainWindow::putTasksIntoFile()
 
 
 // ------------------- Tray -------------------
-void MainWindow::set_tray_settings() {
-    tray = new QSystemTrayIcon();
-    tray->setIcon(QIcon("://icon.png"));
-    tray->setVisible(true);
 
-    trayMenu = new QMenu();
-    trayOpen = trayMenu->addAction("Open");
-    trayQuit = trayMenu->addAction("Quit");
-
-    QObject::connect(trayOpen, &QAction::triggered, this, &MainWindow::openFromTray);
-    QObject::connect(trayQuit, &QAction::triggered, this, &MainWindow::quitFromTray);
-
-    tray->setContextMenu(trayMenu);
+void Tray::openFromTray(MainWindow* mw) {
+    mw->show();
 }
 
-void MainWindow::openFromTray() {
-        this->show();
-}
-
-void MainWindow::quitFromTray() {
+void Tray::quitFromTray() {
     QApplication::quit();
 }
 
