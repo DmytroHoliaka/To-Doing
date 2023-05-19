@@ -139,9 +139,8 @@ public:
 
 class Date
 {
-    // Todo: Ctor Copy
     friend class MainWindow;
-public: // Todo: private
+private:
     int daysCounter;
     QString currentDay;
     QString space;
@@ -156,18 +155,13 @@ public:
         this->dateLabel = nullptr;
     }
 
-    Date(const Date& other)
+    ~Date();
+    void print();
+    void recount()
     {
-        this->daysCounter = 0;
-        this->space = "----------------------";
         this->currentDay = this->get_date();
-        this->dateLabel = nullptr;
-        this->setDateLabel(other.dateLabel);
     }
 
-    ~Date();
-
-    void print();
 
     QString get_date() {
         return QDate::currentDate().addDays(this->daysCounter).toString("dd.MM.yyyy");
@@ -183,10 +177,11 @@ public:
         return this->currentDay;
     }
 
-    void recount()
+    QLabel* getDateLabel()
     {
-        this->currentDay = this->get_date();
+        return this->dateLabel;
     }
+
 
     void setDaysCounter(int count)
     {
@@ -198,35 +193,31 @@ public:
         this->dateLabel = dateLabel;
     }
 
-    QLabel* getDateLabel()
-    {
-        return this->dateLabel;
-    }
 
-    Date operator++()
+    Date* operator++()
     {
         ++this->daysCounter;
-        return *this;
+        return this;
     }
 
-    Date operator--()
+    Date* operator--()
     {
         --this->daysCounter;
-         return *this;
+         return this;
     }
 
-    Date operator++(int)
+    Date* operator++(int)
     {
         Date temp = *this;
         ++this->daysCounter;
-        return *this;
+        return this;
     }
 
-    Date operator--(int)
+    Date* operator--(int)
     {
         Date temp = *this;
         --this->daysCounter;
-        return *this;
+        return this;
     }
 };
 
@@ -261,7 +252,7 @@ public:
 
 class MainButtonManager : public QObject    // Todo: Перейменуй, можливо WingetManager
 {
-public: // Todo: private
+private: // Todo: private
     QPushButton* add;
     QPushButton* remove;
     QPushButton* edit;
@@ -309,6 +300,15 @@ public:
 
     ~MainButtonManager();
 
+    QListWidget* getThingsList()
+    {
+        return this->thingsList;
+    }
+
+    FileData* getFile()
+    {
+        return this->file;
+    }
 
     void setAdd(QPushButton* addButton)
     {
@@ -354,6 +354,7 @@ public:
     {
         this->previous = previousButton;
     }
+
 
     void makeConections(Date& date);
     void afterChanged(QListWidgetItem*);

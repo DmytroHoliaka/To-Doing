@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->setupUi(this);
 
     date.setDateLabel(ui->date_label);
-//    date.print();
+    date.print();
 
     topPanelObj.setExit(ui->actionExit);
     topPanelObj.setTop(ui->actionAlways_on_top);
@@ -31,12 +31,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
 
-    manager.file->getTasksFromFile(&manager, date);
+    manager.getFile()->getTasksFromFile(&manager, date);
 }
 
 MainWindow::~MainWindow() {
 
-    manager.file->putTasksIntoFile(&manager, date);
+    manager.getFile()->putTasksIntoFile(&manager, date);
 
     delete ui;
 }
@@ -68,8 +68,8 @@ void FileData::getTasksFromFile(MainButtonManager* manager, Date& date)
             QString line = in.readLine();
             const QChar state = line.at(0);
 
-            QListWidgetItem* item = new QListWidgetItem(line.mid(1), manager->thingsList);
-            manager->thingsList->addItem(item);
+            QListWidgetItem* item = new QListWidgetItem(line.mid(1), manager->getThingsList());
+            manager->getThingsList()->addItem(item);
             item->setFlags(item->flags() | Qt::ItemIsEditable);
 
             QIcon icon(picture[state]);
@@ -96,10 +96,10 @@ void FileData::putTasksIntoFile(MainButtonManager* manager, Date& date)
     }
 
     QTextStream out(&file);
-    for (int i = 0; i < manager->thingsList->count(); ++i) {
-        QString key = manager->thingsList->item(i)->data(Qt::UserRole).toString();
+    for (int i = 0; i < manager->getThingsList()->count(); ++i) {
+        QString key = manager->getThingsList()->item(i)->data(Qt::UserRole).toString();
 
-        out << task_state[key] << manager->thingsList->item(i)->text() << "\n";
+        out << task_state[key] << manager->getThingsList()->item(i)->text() << "\n";
     }
 
     file.close();
@@ -231,8 +231,6 @@ void MainButtonManager::makeConections(Date& date)
     QObject::connect(this->previous, &QPushButton::clicked, this, [this, &date](){
         this->on_previousDay_clicked(date);
     });
-
-
 }
 
 void MainButtonManager::on_previousDay_clicked(Date& date)
@@ -240,8 +238,8 @@ void MainButtonManager::on_previousDay_clicked(Date& date)
     this->file->putTasksIntoFile(this, date);
     this->thingsList->clear();
 
-    --date;
-    date.recount();
+    (--date)->recount();
+    date.print();
     this->file->getTasksFromFile(this, date);
 }
 
@@ -250,8 +248,8 @@ void MainButtonManager::on_nextDay_clicked(Date& date)
     this->file->putTasksIntoFile(this, date);
     this->thingsList->clear();
 
-    ++date;
-    date.recount();
+    (++date)->recount();
+    date.print();
     this->file->getTasksFromFile(this, date);
 }
 
