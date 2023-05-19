@@ -3,17 +3,14 @@
 
 // ------------------- Main Window -------------------
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
-    trayObj.makeConections(this);
-
-
     ui->setupUi(this);
-    date.print(ui->date_label);
+
+    date.setDateLabel(ui->date_label);
+//    date.print();
 
     topPanelObj.setExit(ui->actionExit);
     topPanelObj.setTop(ui->actionAlways_on_top);
     topPanelObj.setReset(ui->actionReset_to_default);
-    topPanelObj.makeConections(this);
-
 
     manager.setAdd(ui->Add);
     manager.setRemove(ui->Remove);
@@ -22,38 +19,24 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     manager.setDone(ui->doneTask);
     manager.setExpected(ui->expectedTask);
     manager.setFailed(ui->failedTask);
+    manager.setNext(ui->nextDay);
+    manager.setPrevious(ui->previousDay);
 
-    manager.makeConections();
-
-    this->setWindowTitle("ToDoing");
-    this->setWindowIcon(QIcon(":/icon.png"));
-
-
-
-    basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
-
+    manager.makeConections(date);
+    trayObj.makeConections(this);
+    topPanelObj.makeConections(this);
 
 
     customize_list_font("Constantia", 17, 60);
+    this->setWindowTitle("ToDoing");
+    this->setWindowIcon(QIcon(":/icon.png"));
 
-    task_state.insert("flag_done", '2');
-    task_state.insert("", '1');
-    task_state.insert("flag_failed", '0');
-
-    picture.insert('2', "://done.png");
-    picture.insert('1', "://expected.png");
-    picture.insert('0', "://failed.png");
-
-    flag.insert('2', "flag_done");
-    flag.insert('1', "");
-    flag.insert('0', "flag_failed");
-
-    getTasksFromFile();
+    manager.file->getTasksFromFile(&manager, date);
 }
 
 MainWindow::~MainWindow() {
 
-    putTasksIntoFile();
+    manager.file->putTasksIntoFile(&manager, date);
 
     delete ui;
 }
@@ -71,31 +54,13 @@ void MainWindow::customize_list_font(QString font_name, int size, int block_heig
     ui->things_list->setStyleSheet(QString("QListWidget::item { height:%1px; }").arg(block_height));
 }
 
-void MainWindow::on_previousDay_clicked()
+
+
+
+// ------------------- File Data -------------------
+void FileData::getTasksFromFile(MainButtonManager* manager, Date& date)
 {
-    putTasksIntoFile();
-    ui->things_list->clear();
-
-    --date;
-    date.recount();
-    date.print(ui->date_label);
-    getTasksFromFile();
-}
-
-void MainWindow::on_nextDay_clicked()
-{
-    putTasksIntoFile();
-    ui->things_list->clear();
-
-    ++date;
-    date.recount();
-    date.print(ui->date_label);
-    getTasksFromFile();
-}
-
-void MainWindow::getTasksFromFile()
-{
-    QFile file(basePath + date.getCurrentDay() + ".txt");
+    QFile file(this->basePath + date.getCurrentDay() + ".txt");
     if (file.open(QIODevice::ReadOnly)) {
         QTextStream in(&file);
 
@@ -103,8 +68,8 @@ void MainWindow::getTasksFromFile()
             QString line = in.readLine();
             const QChar state = line.at(0);
 
-            QListWidgetItem* item = new QListWidgetItem(line.mid(1), ui->things_list);
-            ui->things_list->addItem(item);
+            QListWidgetItem* item = new QListWidgetItem(line.mid(1), manager->thingsList);
+            manager->thingsList->addItem(item);
             item->setFlags(item->flags() | Qt::ItemIsEditable);
 
             QIcon icon(picture[state]);
@@ -117,7 +82,7 @@ void MainWindow::getTasksFromFile()
     file.close();
 }
 
-void MainWindow::putTasksIntoFile()
+void FileData::putTasksIntoFile(MainButtonManager* manager, Date& date)
 {
     QDir directory(QCoreApplication::applicationDirPath());
     QString folderName = "tasks_base";
@@ -131,10 +96,10 @@ void MainWindow::putTasksIntoFile()
     }
 
     QTextStream out(&file);
-    for (int i = 0; i < ui->things_list->count(); ++i) {
-        QString key = ui->things_list->item(i)->data(Qt::UserRole).toString();
+    for (int i = 0; i < manager->thingsList->count(); ++i) {
+        QString key = manager->thingsList->item(i)->data(Qt::UserRole).toString();
 
-        out << task_state[key] << ui->things_list->item(i)->text() << "\n";
+        out << task_state[key] << manager->thingsList->item(i)->text() << "\n";
     }
 
     file.close();
@@ -143,48 +108,22 @@ void MainWindow::putTasksIntoFile()
 
 
 
-// ------------------- Tray -------------------
-void Tray::openFromTray(MainWindow* mw) {
-    mw->show();
-}
-
-void Tray::quitFromTray() {
-    QApplication::quit();
-}
-
-
-
-
-// ------------------- Top Panel -------------------
-
-TopPanel::~TopPanel()
-{
-    delete exit;
-    delete top;
-    delete reset;
-}
-
-void TopPanel::menuAlways_on_top(MainWindow* mw) {
-    mw->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint); // закріплення вікна
-    mw->show();
-}
-
-void TopPanel::menuReset_to_default(MainWindow* mw) {
-    mw->setWindowFlags(Qt::Window);
-    mw->show();
-}
-
-
-
-// ------------------- Date -------------------
-void Date::print(QLabel* dateLabel)
-{
-    dateLabel->setText(this->space + "  " + this->currentDay + "  " + this->space);
-}
-
-
-
 // ------------------- Main Button Manager -------------------
+MainButtonManager::~MainButtonManager()
+{
+    delete add;
+    delete remove;
+    delete edit;
+    delete done;
+    delete expected;
+    delete failed;
+    delete next;
+    delete previous;
+
+    delete file;
+    delete thingsList;
+}
+
 void MainButtonManager::on_doneTask_clicked() {      // Done
     QListWidgetItem* item = this->thingsList->currentItem();
 
@@ -255,7 +194,7 @@ void MainButtonManager::afterChanged(QListWidgetItem* tempItem)
     }
 }
 
-void MainButtonManager::makeConections()
+void MainButtonManager::makeConections(Date& date)
 {
     QObject::connect(this->add, &QPushButton::clicked, this, [this](){
         this->on_Add_clicked(this->thingsList);
@@ -285,14 +224,85 @@ void MainButtonManager::makeConections()
         this->afterChanged(this->thingsList->currentItem());
     });
 
+    QObject::connect(this->next, &QPushButton::clicked, this, [this, &date](){
+        this->on_nextDay_clicked(date);
+    });
+
+    QObject::connect(this->previous, &QPushButton::clicked, this, [this, &date](){
+        this->on_previousDay_clicked(date);
+    });
+
 
 }
 
-MainButtonManager::~MainButtonManager()
+void MainButtonManager::on_previousDay_clicked(Date& date)
 {
-    delete add;
-    delete remove;
-    delete edit;
-    delete thingsList;
+    this->file->putTasksIntoFile(this, date);
+    this->thingsList->clear();
+
+    --date;
+    date.recount();
+    this->file->getTasksFromFile(this, date);
 }
+
+void MainButtonManager::on_nextDay_clicked(Date& date)
+{
+    this->file->putTasksIntoFile(this, date);
+    this->thingsList->clear();
+
+    ++date;
+    date.recount();
+    this->file->getTasksFromFile(this, date);
+}
+
+
+
+
+// ------------------- Tray -------------------
+void Tray::openFromTray(MainWindow* mw) {
+    mw->show();
+}
+
+void Tray::quitFromTray() {
+    QApplication::quit();
+}
+
+
+
+
+
+// ------------------- Top Panel -------------------
+
+TopPanel::~TopPanel()
+{
+    delete exit;
+    delete top;
+    delete reset;
+}
+
+void TopPanel::menuAlways_on_top(MainWindow* mw) {
+    mw->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint); // закріплення вікна
+    mw->show();
+}
+
+void TopPanel::menuReset_to_default(MainWindow* mw) {
+    mw->setWindowFlags(Qt::Window);
+    mw->show();
+}
+
+
+
+
+// ------------------- Date -------------------
+void Date::print()
+{
+    this->dateLabel->setText(this->space + "  " + this->currentDay + "  " + this->space);
+}
+
+Date::~Date()
+{
+    delete dateLabel;
+}
+
+
 

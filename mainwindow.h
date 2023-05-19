@@ -28,6 +28,7 @@ QT_END_NAMESPACE
 
 
 class MainWindow;
+class MainButtonManager;
 
 
 class Tray : public QObject
@@ -58,6 +59,14 @@ public:
         tray->setContextMenu(trayMenu);
     }
 
+    ~Tray()
+    {
+        delete tray;
+        delete trayOpen;
+        delete trayQuit;
+        delete trayMenu;
+    }
+
     void makeConections(MainWindow* mw)
     {
         QObject::connect(trayOpen, &QAction::triggered, this, [this, mw]() {
@@ -65,14 +74,6 @@ public:
         });
         QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
     }
-
-   ~Tray()
-   {
-       delete tray;
-       delete trayOpen;
-       delete trayQuit;
-       delete trayMenu;
-   }
 };
 
 class TopPanel : public QObject
@@ -104,6 +105,8 @@ public:
         this->reset = resetMenu;
     }
 
+    ~TopPanel();
+
     void setExit(QAction* exitMenu)
     {
         this->exit = exitMenu;
@@ -132,17 +135,17 @@ public:
             this->menuReset_to_default(mw);
         });
     }
-
-    ~TopPanel();
 };
 
 class Date
 {
+    // Todo: Ctor Copy
     friend class MainWindow;
-private:
+public: // Todo: private
     int daysCounter;
     QString currentDay;
     QString space;
+    QLabel* dateLabel;
 
 public:
     Date()
@@ -150,9 +153,21 @@ public:
         this->daysCounter = 0;
         this->space = "----------------------";
         this->currentDay = this->get_date();
+        this->dateLabel = nullptr;
     }
 
-    void print(QLabel* dataLabel);
+    Date(const Date& other)
+    {
+        this->daysCounter = 0;
+        this->space = "----------------------";
+        this->currentDay = this->get_date();
+        this->dateLabel = nullptr;
+        this->setDateLabel(other.dateLabel);
+    }
+
+    ~Date();
+
+    void print();
 
     QString get_date() {
         return QDate::currentDate().addDays(this->daysCounter).toString("dd.MM.yyyy");
@@ -176,6 +191,16 @@ public:
     void setDaysCounter(int count)
     {
         this->daysCounter = count;
+    }
+
+    void setDateLabel(QLabel* dateLabel)
+    {
+        this->dateLabel = dateLabel;
+    }
+
+    QLabel* getDateLabel()
+    {
+        return this->dateLabel;
     }
 
     Date operator++()
@@ -205,17 +230,48 @@ public:
     }
 };
 
-class MainButtonManager : public QObject
+class FileData
 {
-
 private:
+    QString basePath;
+    QMap<QString, QChar> task_state;
+    QMap<QChar, QString> picture;
+    QMap<QChar, QString> flag;
+
+public:
+    FileData()
+    {
+        basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
+        task_state.insert("flag_done", '2');
+        task_state.insert("", '1');
+        task_state.insert("flag_failed", '0');
+
+        picture.insert('2', "://done.png");
+        picture.insert('1', "://expected.png");
+        picture.insert('0', "://failed.png");
+
+        flag.insert('2', "flag_done");
+        flag.insert('1', "");
+        flag.insert('0', "flag_failed");
+    }
+
+    void getTasksFromFile(MainButtonManager* manager, Date& date);
+    void putTasksIntoFile(MainButtonManager* manager, Date& date);
+};
+
+class MainButtonManager : public QObject    // Todo: Перейменуй, можливо WingetManager
+{
+public: // Todo: private
     QPushButton* add;
     QPushButton* remove;
     QPushButton* edit;
     QPushButton* done;
     QPushButton* expected;
     QPushButton* failed;
+    QPushButton* next;
+    QPushButton* previous;
 
+    FileData* file;
     QListWidget* thingsList;
 
 
@@ -226,14 +282,28 @@ public:
         this->add = nullptr;
         this->remove = nullptr;
         this->edit = nullptr;
+        this->next = nullptr;
+        this->previous = nullptr;
+
+        this->file = new FileData;
         this->thingsList = nullptr;
     }
 
-    MainButtonManager(QPushButton* addButton, QPushButton* removeButton, QPushButton* editButton, QListWidget* thingsList)
+    MainButtonManager(QPushButton* addButton,
+                      QPushButton* removeButton,
+                      QPushButton* editButton,
+                      QPushButton* nextButton,
+                      QPushButton* prevButton,
+                      FileData* file,
+                      QListWidget* thingsList)
     {
         this->add = addButton;
         this->remove = removeButton;
         this->edit = editButton;
+        this->next = nextButton;
+        this->previous = prevButton;
+
+        this->file = file;
         this->thingsList = thingsList;
     }
 
@@ -275,8 +345,17 @@ public:
         this->failed = failedButton;
     }
 
+    void setNext(QPushButton* nextButton)
+    {
+        this->next = nextButton;
+    }
 
-    void makeConections();
+    void setPrevious(QPushButton* previousButton)
+    {
+        this->previous = previousButton;
+    }
+
+    void makeConections(Date& date);
     void afterChanged(QListWidgetItem*);
 
 
@@ -286,7 +365,10 @@ public:
     void on_doneTask_clicked();
     void on_expectedTask_clicked();
     void on_failedTask_clicked();
+    void on_previousDay_clicked(Date& date);
+    void on_nextDay_clicked(Date& date);
 };
+
 
 class MainWindow : public QMainWindow
 {
@@ -299,28 +381,16 @@ private:
     MainButtonManager manager;
 
 
-    QString basePath;
     Ui::MainWindow *ui;
-
-    QMap<QString, QChar> task_state;
-    QMap<QChar, QString> picture;
-    QMap<QChar, QString> flag;
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     void customize_list_font(QString, int, int);
-    void getTasksFromFile();
-    void putTasksIntoFile();
-
-private slots:
-    void on_previousDay_clicked();
-    void on_nextDay_clicked();
 
 protected:
     void closeEvent(QCloseEvent*) override;
-
 };
 
 #endif // MAINWINDOW_H
