@@ -212,6 +212,10 @@ private:
     QPushButton* add;
     QPushButton* remove;
     QPushButton* edit;
+    QPushButton* done;
+    QPushButton* expected;
+    QPushButton* failed;
+
     QListWidget* thingsList;
 
 
@@ -230,8 +234,11 @@ public:
         this->add = addButton;
         this->remove = removeButton;
         this->edit = editButton;
-        this->thingsList = nullptr;
+        this->thingsList = thingsList;
     }
+
+    ~MainButtonManager();
+
 
     void setAdd(QPushButton* addButton)
     {
@@ -253,16 +260,32 @@ public:
         this->thingsList = thingsList;
     }
 
+    void setDone(QPushButton* doneButton)
+    {
+        this->done = doneButton;
+    }
+
+    void setExpected(QPushButton* expectedButton)
+    {
+        this->expected = expectedButton;
+    }
+
+    void setFailed(QPushButton* failedButton)
+    {
+        this->failed = failedButton;
+    }
+
+
     void makeConections();
+    void afterChanged(QListWidgetItem*);
+
 
     void on_Add_clicked(QListWidget* list);
     void on_Edit_clicked(QListWidget* list);
     void on_Remove_clicked(QListWidget* list);
-
-    void afterChanged(QListWidgetItem*);
-
-
-    ~MainButtonManager();
+    void on_doneTask_clicked();
+    void on_expectedTask_clicked();
+    void on_failedTask_clicked();
 };
 
 class MainWindow : public QMainWindow
@@ -270,13 +293,14 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    QString basePath;
-    Ui::MainWindow *ui;
-
     Tray trayObj;
     TopPanel topPanelObj;
     Date date;
     MainButtonManager manager;
+
+
+    QString basePath;
+    Ui::MainWindow *ui;
 
     QMap<QString, QChar> task_state;
     QMap<QChar, QString> picture;
@@ -284,25 +308,15 @@ private:
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
     void customize_list_font(QString, int, int);
     void getTasksFromFile();
     void putTasksIntoFile();
-    ~MainWindow();
-
 
 private slots:
-    void on_doneTask_clicked();
-
-    void on_expectedTask_clicked();
-
-    void on_failedTask_clicked();
-
     void on_previousDay_clicked();
-
     void on_nextDay_clicked();
-
-
 
 protected:
     void closeEvent(QCloseEvent*) override;

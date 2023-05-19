@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+// ------------------- Main Window -------------------
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     trayObj.makeConections(this);
 
@@ -18,13 +19,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     manager.setRemove(ui->Remove);
     manager.setEdit(ui->Edit);
     manager.setThingsList(ui->things_list);
+    manager.setDone(ui->doneTask);
+    manager.setExpected(ui->expectedTask);
+    manager.setFailed(ui->failedTask);
+
     manager.makeConections();
 
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
-
-
-    // Припустимо, у вас є об'єкт QListWidget з назвою things_list і ви хочете зв'язати його сигнал з методом on_things_list_itemChanged
 
 
 
@@ -46,50 +48,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     flag.insert('1', "");
     flag.insert('0', "flag_failed");
 
-    // ------------------- Menu actions -------------------
-
-    // ---------------------------------------------------
-
     getTasksFromFile();
-}
-
-void MainButtonManager::makeConections()
-{
-    QObject::connect(this->add, &QPushButton::clicked, this, [this](){
-        this->on_Add_clicked(this->thingsList);
-    });
-
-    QObject::connect(this->remove, &QPushButton::clicked, this, [this](){
-        this->on_Remove_clicked(this->thingsList);
-    });
-
-    QObject::connect(this->edit, &QPushButton::clicked, this, [this](){
-        this->on_Edit_clicked(this->thingsList);
-    });
-
-    QObject::connect(this->thingsList, &QListWidget::itemChanged, this, [this](){
-        this->afterChanged(this->thingsList->currentItem());
-    });
-}
-
-MainButtonManager::~MainButtonManager()
-{
-    delete add;
-    delete remove;
-    delete edit;
-    delete thingsList;
-}
-
-void Date::print(QLabel* dateLabel)
-{
-    dateLabel->setText(this->space + "  " + this->currentDay + "  " + this->space);
-}
-
-TopPanel::~TopPanel()
-{
-    delete exit;
-    delete top;
-    delete reset;
 }
 
 MainWindow::~MainWindow() {
@@ -97,6 +56,41 @@ MainWindow::~MainWindow() {
     putTasksIntoFile();
 
     delete ui;
+}
+
+// Дії при закритті вікна
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    event->ignore();
+    this->hide();
+}
+
+void MainWindow::customize_list_font(QString font_name, int size, int block_height) {
+    QFont font(font_name, size);
+    ui->things_list->setFont(font);
+    ui->things_list->setStyleSheet(QString("QListWidget::item { height:%1px; }").arg(block_height));
+}
+
+void MainWindow::on_previousDay_clicked()
+{
+    putTasksIntoFile();
+    ui->things_list->clear();
+
+    --date;
+    date.recount();
+    date.print(ui->date_label);
+    getTasksFromFile();
+}
+
+void MainWindow::on_nextDay_clicked()
+{
+    putTasksIntoFile();
+    ui->things_list->clear();
+
+    ++date;
+    date.recount();
+    date.print(ui->date_label);
+    getTasksFromFile();
 }
 
 void MainWindow::getTasksFromFile()
@@ -147,8 +141,9 @@ void MainWindow::putTasksIntoFile()
 }
 
 
-// ------------------- Tray -------------------
 
+
+// ------------------- Tray -------------------
 void Tray::openFromTray(MainWindow* mw) {
     mw->show();
 }
@@ -157,7 +152,17 @@ void Tray::quitFromTray() {
     QApplication::quit();
 }
 
-// ------------------- Menu -------------------
+
+
+
+// ------------------- Top Panel -------------------
+
+TopPanel::~TopPanel()
+{
+    delete exit;
+    delete top;
+    delete reset;
+}
 
 void TopPanel::menuAlways_on_top(MainWindow* mw) {
     mw->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint); // закріплення вікна
@@ -169,25 +174,19 @@ void TopPanel::menuReset_to_default(MainWindow* mw) {
     mw->show();
 }
 
-// ------------------- Menu -------------------
 
-// Дії при закритті вікна
-void MainWindow::closeEvent(QCloseEvent* event)
+
+// ------------------- Date -------------------
+void Date::print(QLabel* dateLabel)
 {
-    event->ignore();
-    this->hide();
-}
-
-void MainWindow::customize_list_font(QString font_name, int size, int block_height) {
-    QFont font(font_name, size);
-    ui->things_list->setFont(font);
-    ui->things_list->setStyleSheet(QString("QListWidget::item { height:%1px; }").arg(block_height));
+    dateLabel->setText(this->space + "  " + this->currentDay + "  " + this->space);
 }
 
 
-// ------------------- Marking buttons -------------------
-void MainWindow::on_doneTask_clicked() {      // Done
-    QListWidgetItem* item = ui->things_list->currentItem();
+
+// ------------------- Main Button Manager -------------------
+void MainButtonManager::on_doneTask_clicked() {      // Done
+    QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item){
         QIcon icon("://done.png");
@@ -197,8 +196,8 @@ void MainWindow::on_doneTask_clicked() {      // Done
     }
 }
 
-void MainWindow::on_expectedTask_clicked() {  // Expected
-    QListWidgetItem* item = ui->things_list->currentItem();
+void MainButtonManager::on_expectedTask_clicked() {  // Expected
+    QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item) {
         QIcon icon("://expected.png");
@@ -208,9 +207,8 @@ void MainWindow::on_expectedTask_clicked() {  // Expected
     }
 }
 
-
-void MainWindow::on_failedTask_clicked() {    // Failed
-    QListWidgetItem* item = ui->things_list->currentItem();
+void MainButtonManager::on_failedTask_clicked() {    // Failed
+    QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item){
         QIcon icon("://failed.png");
@@ -219,31 +217,6 @@ void MainWindow::on_failedTask_clicked() {    // Failed
         item->setData(Qt::UserRole, "flag_failed");
     }
 }
-
-void MainWindow::on_previousDay_clicked()
-{
-    putTasksIntoFile();
-    ui->things_list->clear();
-
-    --date;
-    date.recount();
-    date.print(ui->date_label);
-    getTasksFromFile();
-}
-
-void MainWindow::on_nextDay_clicked()
-{
-    putTasksIntoFile();
-    ui->things_list->clear();
-
-    ++date;
-    date.recount();
-    date.print(ui->date_label);
-    getTasksFromFile();
-}
-
-
-// ------------------- Main Buttons -------------------
 
 void MainButtonManager::on_Add_clicked(QListWidget* list)  // Add
 {
@@ -282,4 +255,44 @@ void MainButtonManager::afterChanged(QListWidgetItem* tempItem)
     }
 }
 
+void MainButtonManager::makeConections()
+{
+    QObject::connect(this->add, &QPushButton::clicked, this, [this](){
+        this->on_Add_clicked(this->thingsList);
+    });
+
+    QObject::connect(this->remove, &QPushButton::clicked, this, [this](){
+        this->on_Remove_clicked(this->thingsList);
+    });
+
+    QObject::connect(this->edit, &QPushButton::clicked, this, [this](){
+        this->on_Edit_clicked(this->thingsList);
+    });
+
+    QObject::connect(this->done, &QPushButton::clicked, this, [this](){
+        this->on_doneTask_clicked();
+    });
+
+    QObject::connect(this->expected, &QPushButton::clicked, this, [this](){
+        this->on_expectedTask_clicked();
+    });
+
+    QObject::connect(this->failed, &QPushButton::clicked, this, [this](){
+        this->on_failedTask_clicked();
+    });
+
+    QObject::connect(this->thingsList, &QListWidget::itemChanged, this, [this](){
+        this->afterChanged(this->thingsList->currentItem());
+    });
+
+
+}
+
+MainButtonManager::~MainButtonManager()
+{
+    delete add;
+    delete remove;
+    delete edit;
+    delete thingsList;
+}
 
