@@ -28,7 +28,7 @@ QT_END_NAMESPACE
 
 
 class MainWindow;
-class MainButtonManager;
+class WidgetManager;
 
 
 class Tray : public QObject
@@ -246,13 +246,13 @@ public:
         flag.insert('0', "flag_failed");
     }
 
-    void getTasksFromFile(MainButtonManager* manager, Date& date);
-    void putTasksIntoFile(MainButtonManager* manager, Date& date);
+    void getTasksFromFile(WidgetManager* manager, Date& date);
+    void putTasksIntoFile(WidgetManager* manager, Date& date);
 };
 
-class MainButtonManager : public QObject    // Todo: Перейменуй, можливо WingetManager
+class WidgetManager : public QObject    // Todo: Перейменуй, можливо WingetManager
 {
-private: // Todo: private
+private:
     QPushButton* add;
     QPushButton* remove;
     QPushButton* edit;
@@ -268,7 +268,7 @@ private: // Todo: private
 
 
 public:
-    MainButtonManager()
+    WidgetManager()
     {
         this->add = nullptr;
         this->remove = nullptr;
@@ -280,7 +280,7 @@ public:
         this->thingsList = nullptr;
     }
 
-    MainButtonManager(QPushButton* addButton,
+    WidgetManager(QPushButton* addButton,
                       QPushButton* removeButton,
                       QPushButton* editButton,
                       QPushButton* nextButton,
@@ -298,7 +298,7 @@ public:
         this->thingsList = thingsList;
     }
 
-    ~MainButtonManager();
+    ~WidgetManager();
 
     QListWidget* getThingsList()
     {
@@ -379,7 +379,7 @@ private:
     Tray trayObj;
     TopPanel topPanelObj;
     Date date;
-    MainButtonManager manager;
+    WidgetManager manager;
 
 
     Ui::MainWindow *ui;

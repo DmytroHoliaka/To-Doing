@@ -58,7 +58,7 @@ void MainWindow::customize_list_font(QString font_name, int size, int block_heig
 
 
 // ------------------- File Data -------------------
-void FileData::getTasksFromFile(MainButtonManager* manager, Date& date)
+void FileData::getTasksFromFile(WidgetManager* manager, Date& date)
 {
     QFile file(this->basePath + date.getCurrentDay() + ".txt");
     if (file.open(QIODevice::ReadOnly)) {
@@ -82,7 +82,7 @@ void FileData::getTasksFromFile(MainButtonManager* manager, Date& date)
     file.close();
 }
 
-void FileData::putTasksIntoFile(MainButtonManager* manager, Date& date)
+void FileData::putTasksIntoFile(WidgetManager* manager, Date& date)
 {
     QDir directory(QCoreApplication::applicationDirPath());
     QString folderName = "tasks_base";
@@ -108,8 +108,8 @@ void FileData::putTasksIntoFile(MainButtonManager* manager, Date& date)
 
 
 
-// ------------------- Main Button Manager -------------------
-MainButtonManager::~MainButtonManager()
+// ------------------- Widget Manager -------------------
+WidgetManager::~WidgetManager()
 {
     delete add;
     delete remove;
@@ -124,7 +124,7 @@ MainButtonManager::~MainButtonManager()
     delete thingsList;
 }
 
-void MainButtonManager::on_doneTask_clicked() {      // Done
+void WidgetManager::on_doneTask_clicked() {      // Done
     QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item){
@@ -135,7 +135,7 @@ void MainButtonManager::on_doneTask_clicked() {      // Done
     }
 }
 
-void MainButtonManager::on_expectedTask_clicked() {  // Expected
+void WidgetManager::on_expectedTask_clicked() {  // Expected
     QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item) {
@@ -146,7 +146,7 @@ void MainButtonManager::on_expectedTask_clicked() {  // Expected
     }
 }
 
-void MainButtonManager::on_failedTask_clicked() {    // Failed
+void WidgetManager::on_failedTask_clicked() {    // Failed
     QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item){
@@ -157,7 +157,7 @@ void MainButtonManager::on_failedTask_clicked() {    // Failed
     }
 }
 
-void MainButtonManager::on_Add_clicked(QListWidget* list)  // Add
+void WidgetManager::on_Add_clicked(QListWidget* list)  // Add
 {
     QListWidgetItem* item = new QListWidgetItem(list);
     item->setFlags(item->flags() | Qt::ItemIsEditable);
@@ -170,7 +170,7 @@ void MainButtonManager::on_Add_clicked(QListWidget* list)  // Add
     item->setSelected(true);                                // виділяємо елемент
 }
 
-void MainButtonManager::on_Remove_clicked(QListWidget* list)  // Remove
+void WidgetManager::on_Remove_clicked(QListWidget* list)  // Remove
 {
     QListWidgetItem* item = list->currentItem();
     if (item) {
@@ -178,7 +178,7 @@ void MainButtonManager::on_Remove_clicked(QListWidget* list)  // Remove
     }
 }
 
-void MainButtonManager::on_Edit_clicked(QListWidget* list)  // Edit
+void WidgetManager::on_Edit_clicked(QListWidget* list)  // Edit
 {
     QListWidgetItem* item = list->currentItem();
     if (item) {
@@ -187,14 +187,14 @@ void MainButtonManager::on_Edit_clicked(QListWidget* list)  // Edit
 }
 
 // Видалення пустих рядків(коли вони обрані)
-void MainButtonManager::afterChanged(QListWidgetItem* tempItem)
+void WidgetManager::afterChanged(QListWidgetItem* tempItem)
 {
     if(tempItem != nullptr && tempItem->isSelected() && tempItem->text().isEmpty()){
         delete tempItem;
     }
 }
 
-void MainButtonManager::makeConections(Date& date)
+void WidgetManager::makeConections(Date& date)
 {
     QObject::connect(this->add, &QPushButton::clicked, this, [this](){
         this->on_Add_clicked(this->thingsList);
@@ -233,7 +233,7 @@ void MainButtonManager::makeConections(Date& date)
     });
 }
 
-void MainButtonManager::on_previousDay_clicked(Date& date)
+void WidgetManager::on_previousDay_clicked(Date& date)
 {
     this->file->putTasksIntoFile(this, date);
     this->thingsList->clear();
@@ -243,7 +243,7 @@ void MainButtonManager::on_previousDay_clicked(Date& date)
     this->file->getTasksFromFile(this, date);
 }
 
-void MainButtonManager::on_nextDay_clicked(Date& date)
+void WidgetManager::on_nextDay_clicked(Date& date)
 {
     this->file->putTasksIntoFile(this, date);
     this->thingsList->clear();
