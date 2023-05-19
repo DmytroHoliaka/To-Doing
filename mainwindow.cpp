@@ -26,11 +26,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     // Припустимо, у вас є об'єкт QListWidget з назвою things_list і ви хочете зв'язати його сигнал з методом on_things_list_itemChanged
 
-//    QObject::connect(ui->things_list, &QListWidget::itemChanged, this, [this](){
-//        qDebug() << "Changed";
-//        this->manager.afterChanged(ui->things_list->currentItem());
-//    });
-
 
 
     basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
@@ -71,11 +66,14 @@ void MainButtonManager::makeConections()
     QObject::connect(this->edit, &QPushButton::clicked, this, [this](){
         this->on_Edit_clicked(this->thingsList);
     });
+
+    QObject::connect(this->thingsList, &QListWidget::itemChanged, this, [this](){
+        this->afterChanged(this->thingsList->currentItem());
+    });
 }
 
 MainButtonManager::~MainButtonManager()
 {
-    delete item;
     delete add;
     delete remove;
     delete edit;
@@ -249,20 +247,20 @@ void MainWindow::on_nextDay_clicked()
 
 void MainButtonManager::on_Add_clicked(QListWidget* list)  // Add
 {
-    this->item = new QListWidgetItem(list);
-    this->item->setFlags(item->flags() | Qt::ItemIsEditable);
+    QListWidgetItem* item = new QListWidgetItem(list);
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
 
     QIcon icon("://expected.png");
-    this->item->setIcon(QIcon(icon));
+    item->setIcon(QIcon(icon));
 
     list->setCurrentItem(item);                  // встановлюємо активність на елемент
     list->edit(list->currentIndex()); // викликаємо метод edit для редагування елемента
-    this->item->setSelected(true);                                // виділяємо елемент
+    item->setSelected(true);                                // виділяємо елемент
 }
 
 void MainButtonManager::on_Remove_clicked(QListWidget* list)  // Remove
 {
-    this->fillCurrentItem(list);
+    QListWidgetItem* item = list->currentItem();
     if (item) {
         delete item;
     }
@@ -270,22 +268,18 @@ void MainButtonManager::on_Remove_clicked(QListWidget* list)  // Remove
 
 void MainButtonManager::on_Edit_clicked(QListWidget* list)  // Edit
 {
-    this->fillCurrentItem(list);
+    QListWidgetItem* item = list->currentItem();
     if (item) {
         list->editItem(item);
     }
 }
 
-void MainButtonManager::fillCurrentItem(QListWidget* list)
-{
-    this->item = list->currentItem();
-}
-
 // Видалення пустих рядків(коли вони обрані)
-void MainButtonManager::afterChanged(QListWidgetItem* item)
+void MainButtonManager::afterChanged(QListWidgetItem* tempItem)
 {
-    if(item->isSelected() && item->text().isEmpty()){
-        delete item;
+    if(tempItem != nullptr && tempItem->isSelected() && tempItem->text().isEmpty()){
+        delete tempItem;
     }
 }
+
 

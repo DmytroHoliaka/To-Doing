@@ -20,6 +20,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QCoreApplication>
+#include <QAbstractItemView>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -208,7 +209,6 @@ class MainButtonManager : public QObject
 {
 
 private:
-    QListWidgetItem* item;
     QPushButton* add;
     QPushButton* remove;
     QPushButton* edit;
@@ -223,14 +223,14 @@ public:
         this->remove = nullptr;
         this->edit = nullptr;
         this->thingsList = nullptr;
-        this->item = nullptr;
     }
 
-    MainButtonManager(QPushButton* addButton, QPushButton* removeButton, QPushButton* editButton)
+    MainButtonManager(QPushButton* addButton, QPushButton* removeButton, QPushButton* editButton, QListWidget* thingsList)
     {
         this->add = addButton;
         this->remove = removeButton;
         this->edit = editButton;
+        this->thingsList = nullptr;
     }
 
     void setAdd(QPushButton* addButton)
@@ -259,7 +259,6 @@ public:
     void on_Edit_clicked(QListWidget* list);
     void on_Remove_clicked(QListWidget* list);
 
-    void fillCurrentItem(QListWidget* list);
     void afterChanged(QListWidgetItem*);
 
 
