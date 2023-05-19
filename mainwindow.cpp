@@ -14,13 +14,25 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     topPanelObj.makeConections(this);
 
 
+    manager.setAdd(ui->Add);
+    manager.setRemove(ui->Remove);
+    manager.setEdit(ui->Edit);
+    manager.setThingsList(ui->things_list);
+    manager.makeConections();
+
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/icon.png"));
 
 
-    QObject::connect(ui->Add, &QPushButton::clicked, this, [this](){
-        this->manager.on_Add_clicked(ui->things_list);
-    });
+    // Припустимо, у вас є об'єкт QListWidget з назвою things_list і ви хочете зв'язати його сигнал з методом on_things_list_itemChanged
+
+//    QObject::connect(ui->things_list, &QListWidget::itemChanged, this, [this](){
+//        qDebug() << "Changed";
+//        this->manager.afterChanged(ui->things_list->currentItem());
+//    });
+
+
+
     basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
 
 
@@ -46,9 +58,40 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     getTasksFromFile();
 }
 
+void MainButtonManager::makeConections()
+{
+    QObject::connect(this->add, &QPushButton::clicked, this, [this](){
+        this->on_Add_clicked(this->thingsList);
+    });
+
+    QObject::connect(this->remove, &QPushButton::clicked, this, [this](){
+        this->on_Remove_clicked(this->thingsList);
+    });
+
+    QObject::connect(this->edit, &QPushButton::clicked, this, [this](){
+        this->on_Edit_clicked(this->thingsList);
+    });
+}
+
+MainButtonManager::~MainButtonManager()
+{
+    delete item;
+    delete add;
+    delete remove;
+    delete edit;
+    delete thingsList;
+}
+
 void Date::print(QLabel* dateLabel)
 {
     dateLabel->setText(this->space + "  " + this->currentDay + "  " + this->space);
+}
+
+TopPanel::~TopPanel()
+{
+    delete exit;
+    delete top;
+    delete reset;
 }
 
 MainWindow::~MainWindow() {
@@ -190,7 +233,6 @@ void MainWindow::on_previousDay_clicked()
     getTasksFromFile();
 }
 
-
 void MainWindow::on_nextDay_clicked()
 {
     putTasksIntoFile();
@@ -218,32 +260,32 @@ void MainButtonManager::on_Add_clicked(QListWidget* list)  // Add
     this->item->setSelected(true);                                // виділяємо елемент
 }
 
-//void MainButtonManager::on_Remove_clicked(QListWidget* list)  // Remove
-//{
-//    this->fillCurrentItem(list);
-//    if (item) {
-//        delete item;
-//    }
-//}
+void MainButtonManager::on_Remove_clicked(QListWidget* list)  // Remove
+{
+    this->fillCurrentItem(list);
+    if (item) {
+        delete item;
+    }
+}
 
-//void MainButtonManager::on_Edit_clicked(QListWidget* list)  // Edit
-//{
-//    this->fillCurrentItem(list);
-//    if (item) {
-//        list->editItem(item);
-//    }
-//}
+void MainButtonManager::on_Edit_clicked(QListWidget* list)  // Edit
+{
+    this->fillCurrentItem(list);
+    if (item) {
+        list->editItem(item);
+    }
+}
 
-//void MainButtonManager::fillCurrentItem(QListWidget* list)
-//{
-//    this->item = list->currentItem();
-//}
+void MainButtonManager::fillCurrentItem(QListWidget* list)
+{
+    this->item = list->currentItem();
+}
 
-//// Видалення пустих рядків(коли вони обрані)
-//void MainButtonManager::on_things_list_itemChanged(QListWidgetItem* item)
-//{
-//    if(item->isSelected() && item->text().isEmpty()){
-//        delete item;
-//    }
-//}
+// Видалення пустих рядків(коли вони обрані)
+void MainButtonManager::afterChanged(QListWidgetItem* item)
+{
+    if(item->isSelected() && item->text().isEmpty()){
+        delete item;
+    }
+}
 

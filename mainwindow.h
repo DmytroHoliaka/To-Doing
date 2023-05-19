@@ -74,7 +74,6 @@ public:
    }
 };
 
-
 class TopPanel : public QObject
 {
     Q_OBJECT
@@ -133,12 +132,7 @@ public:
         });
     }
 
-    ~TopPanel()
-    {
-        delete exit;
-        delete top;
-        delete reset;
-    }
+    ~TopPanel();
 };
 
 class Date
@@ -210,26 +204,66 @@ public:
     }
 };
 
-class MainButtonManager
+class MainButtonManager : public QObject
 {
 
 private:
     QListWidgetItem* item;
+    QPushButton* add;
+    QPushButton* remove;
+    QPushButton* edit;
+    QListWidget* thingsList;
+
+
 
 public:
+    MainButtonManager()
+    {
+        this->add = nullptr;
+        this->remove = nullptr;
+        this->edit = nullptr;
+        this->thingsList = nullptr;
+        this->item = nullptr;
+    }
+
+    MainButtonManager(QPushButton* addButton, QPushButton* removeButton, QPushButton* editButton)
+    {
+        this->add = addButton;
+        this->remove = removeButton;
+        this->edit = editButton;
+    }
+
+    void setAdd(QPushButton* addButton)
+    {
+        this->add = addButton;
+    }
+
+    void setRemove(QPushButton* removeButton)
+    {
+        this->remove = removeButton;
+    }
+
+    void setEdit(QPushButton* editButton)
+    {
+        this->edit = editButton;
+    }
+
+    void setThingsList(QListWidget* thingsList)
+    {
+        this->thingsList = thingsList;
+    }
+
+    void makeConections();
+
     void on_Add_clicked(QListWidget* list);
     void on_Edit_clicked(QListWidget* list);
     void on_Remove_clicked(QListWidget* list);
 
     void fillCurrentItem(QListWidget* list);
-    void on_things_list_itemChanged(QListWidgetItem*);
+    void afterChanged(QListWidgetItem*);
 
-    void makeConections(QPushButton* Add, QListWidget* list);
 
-    ~MainButtonManager()
-    {
-        delete item;
-    }
+    ~MainButtonManager();
 };
 
 class MainWindow : public QMainWindow
@@ -268,6 +302,7 @@ private slots:
     void on_previousDay_clicked();
 
     void on_nextDay_clicked();
+
 
 
 protected:
