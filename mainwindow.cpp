@@ -4,7 +4,6 @@
 // ------------------- Main Window -------------------
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-
     date.setDateLabel(ui->date_label);
     date.print();
 
@@ -31,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->setWindowTitle("ToDoing");
     this->setWindowIcon(QIcon(":/main_icon/icons/icon.png"));
 
+    qInstallMessageHandler(customMessageHandler);
     manager.getFile()->getTasksFromFile(&manager, date);
 }
 
@@ -272,9 +272,9 @@ void WidgetManager::on_Add_clicked(QListWidget* list)  // Add
     QIcon icon(":/markers/icons/expected.png");
     item->setIcon(QIcon(icon));
 
-    list->setCurrentItem(item);                  // встановлюємо активність на елемент
-    list->edit(list->currentIndex()); // викликаємо метод edit для редагування елемента
-    item->setSelected(true);                                // виділяємо елемент
+    list->setCurrentItem(item);                  //  активність на елемент
+    list->edit(list->currentIndex());            // метод edit для редагування елемента
+    item->setSelected(true);
 }
 
 void WidgetManager::on_Remove_clicked(QListWidget* list)  // Remove
@@ -399,6 +399,16 @@ void Tray::makeConections(MainWindow* mw)
     QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
 }
 
+// ------------------- Message Handler -------------------
+void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    if (msg.contains("QAbstractItemView::closeEditor called with an editor that does not belong to this view"))
+        return;
+
+    qInstallMessageHandler(nullptr);
+    qt_message_output(type, context, msg);
+    qInstallMessageHandler(customMessageHandler);
+}
 
 
 
