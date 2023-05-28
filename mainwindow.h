@@ -21,6 +21,9 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QAbstractItemView>
+#include <fstream>
+#include <stdexcept>
+#include <iostream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

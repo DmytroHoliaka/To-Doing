@@ -76,15 +76,15 @@ FileData::FileData()
 
 void FileData::getTasksFromFile(WidgetManager* manager, Date& date)
 {
-    QFile file(this->basePath + date.getCurrentDay() + ".txt");
-    if (file.open(QIODevice::ReadOnly)) {
-        QTextStream in(&file);
-
-        while(!in.atEnd()) {
-            QString line = in.readLine();
-            const QChar state = line.at(0);
-
-            QListWidgetItem* item = new QListWidgetItem(line.mid(1), manager->getThingsList());
+    char state;
+    std::string tempLine;
+    std::ifstream input(this->basePath.toStdString() + date.getCurrentDay().toStdString() + ".txt");
+    if (input.is_open())
+    {
+        while(input >> state)
+        {
+            std::getline(input, tempLine);
+            QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(tempLine), manager->getThingsList());
             manager->getThingsList()->addItem(item);
             item->setFlags(item->flags() | Qt::ItemIsEditable);
 
@@ -95,7 +95,7 @@ void FileData::getTasksFromFile(WidgetManager* manager, Date& date)
         }
     }
 
-    file.close();
+    input.close();
 }
 
 void FileData::putTasksIntoFile(WidgetManager* manager, Date& date)
@@ -106,19 +106,21 @@ void FileData::putTasksIntoFile(WidgetManager* manager, Date& date)
         directory.mkpath(folderName);
     }
 
-    QFile file(basePath + date.getCurrentDay() + ".txt");
-    if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::information(0, "Writing error", file.errorString());
+    std::ofstream output(basePath.toStdString() + date.getCurrentDay().toStdString() + ".txt");
+    if (!output.is_open())
+    {
+        std::cerr << ("putTasksIntoFile: Не вдалося відкрити файл для збреження справ") << std::endl;
+        return;
     }
 
-    QTextStream out(&file);
-    for (int i = 0; i < manager->getThingsList()->count(); ++i) {
-        QString key = manager->getThingsList()->item(i)->data(Qt::UserRole).toString();
-
-        out << task_state[key] << manager->getThingsList()->item(i)->text() << "\n";
+    for (int i = 0; i < manager->getThingsList()->count(); ++i)
+    {
+        std::string key = manager->getThingsList()->item(i)->data(Qt::UserRole).toString().toStdString();
+        output << task_state[QString::fromStdString(key)].toLatin1();
+        output << manager->getThingsList()->item(i)->text().toStdString() << std::endl;
     }
 
-    file.close();
+    output.close();
 }
 
 
@@ -273,7 +275,6 @@ void WidgetManager::on_Add_clicked(QListWidget* list)  // Add
     list->setCurrentItem(item);                  // встановлюємо активність на елемент
     list->edit(list->currentIndex()); // викликаємо метод edit для редагування елемента
     item->setSelected(true);                                // виділяємо елемент
-    delete item;
 }
 
 void WidgetManager::on_Remove_clicked(QListWidget* list)  // Remove
