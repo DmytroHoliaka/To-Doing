@@ -130,46 +130,48 @@ WidgetManager::WidgetManager()
     this->add = nullptr;
     this->remove = nullptr;
     this->edit = nullptr;
+
+    this->done = nullptr;
+    this->expected = nullptr;
+    this->failed = nullptr;
+
     this->next = nullptr;
     this->previous = nullptr;
 
-    this->file = new FileData;
+    this->file =  new FileData;
     this->thingsList = nullptr;
 }
 
-WidgetManager::WidgetManager(QPushButton* addButton,
-                  QPushButton* removeButton,
-                  QPushButton* editButton,
-                  QPushButton* nextButton,
-                  QPushButton* prevButton,
-                  FileData* file,
-                  QListWidget* thingsList)
+WidgetManager::WidgetManager(
+        QPushButton* addButton,
+        QPushButton* removeButton,
+        QPushButton* editButton,
+        QPushButton* doneButton,
+        QPushButton* expectedButton,
+        QPushButton* failedButton,
+        QPushButton* nextButton,
+        QPushButton* prevButton,
+        QListWidget* thingsList)
 {
     this->add = addButton;
     this->remove = removeButton;
     this->edit = editButton;
+
+    this->done = doneButton;
+    this->expected = expectedButton;
+    this->failed = failedButton;
+
     this->next = nextButton;
     this->previous = prevButton;
 
-    this->file = file;
+    this->file = new FileData;
     this->thingsList = thingsList;
 }
 
 WidgetManager::~WidgetManager()
 {
-    delete add;
-    delete remove;
-    delete edit;
-    delete done;
-    delete expected;
-    delete failed;
-    delete next;
-    delete previous;
-
-    delete file;
-    delete thingsList;
+    delete this->file;
 }
-
 
 QListWidget* WidgetManager::getThingsList()
 {
@@ -271,6 +273,7 @@ void WidgetManager::on_Add_clicked(QListWidget* list)  // Add
     list->setCurrentItem(item);                  // встановлюємо активність на елемент
     list->edit(list->currentIndex()); // викликаємо метод edit для редагування елемента
     item->setSelected(true);                                // виділяємо елемент
+    delete item;
 }
 
 void WidgetManager::on_Remove_clicked(QListWidget* list)  // Remove
@@ -384,8 +387,6 @@ Tray::Tray()
 Tray::~Tray()
 {
     delete tray;
-    delete trayOpen;
-    delete trayQuit;
     delete trayMenu;
 }
 
@@ -427,13 +428,6 @@ TopPanel::TopPanel(QAction* exitMenu, QAction* topMenu, QAction* resetMenu)
     this->reset = resetMenu;
 }
 
-TopPanel::~TopPanel()
-{
-    delete exit;
-    delete top;
-    delete reset;
-}
-
 void TopPanel::setExit(QAction* exitMenu)
 {
     this->exit = exitMenu;
@@ -471,11 +465,6 @@ Date::Date()
     this->space = "----------------------";
     this->currentDay = this->get_date();
     this->dateLabel = nullptr;
-}
-
-Date::~Date()
-{
-    delete dateLabel;
 }
 
 void Date::print()
@@ -530,19 +519,5 @@ Date* Date::operator--()
 {
     --this->daysCounter;
      return this;
-}
-
-Date* Date::operator++(int)
-{
-    Date temp = *this;
-    ++this->daysCounter;
-    return this;
-}
-
-Date* Date::operator--(int)
-{
-    Date temp = *this;
-    --this->daysCounter;
-    return this;
 }
 

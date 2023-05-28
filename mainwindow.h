@@ -69,7 +69,6 @@ private slots:
 public:
     TopPanel();
     TopPanel(QAction*, QAction*, QAction*);
-    ~TopPanel();
 
     void setExit(QAction*);
     void setTop(QAction*);
@@ -89,7 +88,6 @@ private:
 
 public:
     Date();
-    ~Date();
 
     void print();
     void recount();
@@ -104,8 +102,6 @@ public:
 
     Date* operator++();
     Date* operator--();
-    Date* operator++(int);
-    Date* operator--(int);
 };
 
 
@@ -133,9 +129,11 @@ private:
     QPushButton* add;
     QPushButton* remove;
     QPushButton* edit;
+
     QPushButton* done;
     QPushButton* expected;
     QPushButton* failed;
+
     QPushButton* next;
     QPushButton* previous;
 
@@ -146,12 +144,14 @@ private:
 public:
     WidgetManager();
     WidgetManager(QPushButton*,
-                      QPushButton*,
-                      QPushButton*,
-                      QPushButton*,
-                      QPushButton*,
-                      FileData*,
-                      QListWidget*);
+                  QPushButton*,
+                  QPushButton*,
+                  QPushButton*,
+                  QPushButton*,
+                  QPushButton*,
+                  QPushButton*,
+                  QPushButton*,
+                  QListWidget*);
     ~WidgetManager();
 
     QListWidget* getThingsList();
