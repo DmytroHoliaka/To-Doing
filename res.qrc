@@ -1,11 +1,20 @@
 <RCC>
-    <qresource prefix="/">
-        <file>icon.png</file>
-        <file>done.png</file>
-        <file>expected.png</file>
-        <file>failed.png</file>
-        <file>draft_done.png</file>
-        <file>draft_expected.png</file>
-        <file>draft_failed.png</file>
+    <qresource prefix="/markers">
+        <file>icons/done.png</file>
+        <file>icons/draft_done.png</file>
+        <file>icons/draft_expected.png</file>
+        <file>icons/draft_failed.png</file>
+        <file>icons/expected.png</file>
+        <file>icons/failed.png</file>
+    </qresource>
+    <qresource prefix="/buttons">
+        <file>icons/add.png</file>
+        <file>icons/next_day.png</file>
+        <file>icons/previous_day.png</file>
+        <file>icons/remove.png</file>
+        <file>icons/edit.png</file>
+    </qresource>
+    <qresource prefix="/main_icon">
+        <file>icons/icon.png</file>
     </qresource>
 </RCC>

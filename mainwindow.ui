@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>843</width>
+    <width>845</width>
     <height>648</height>
    </rect>
   </property>
@@ -245,8 +245,8 @@ color: black;</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>../../Button icons/Add.png</normaloff>../../Button icons/Add.png</iconset>
+             <iconset resource="res.qrc">
+              <normaloff>:/buttons/icons/add.png</normaloff>:/buttons/icons/add.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -281,8 +281,8 @@ color: black;</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>../../Button icons/Remove.png</normaloff>../../Button icons/Remove.png</iconset>
+             <iconset resource="res.qrc">
+              <normaloff>:/buttons/icons/remove.png</normaloff>:/buttons/icons/remove.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -317,8 +317,8 @@ color: black;</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>../../Button icons/Edit.png</normaloff>../../Button icons/Edit.png</iconset>
+             <iconset resource="res.qrc">
+              <normaloff>:/buttons/icons/edit.png</normaloff>:/buttons/icons/edit.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -573,8 +573,8 @@ color: black;</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>../../Button icons/Previous day.png</normaloff>../../Button icons/Previous day.png</iconset>
+             <iconset resource="res.qrc">
+              <normaloff>:/buttons/icons/previous_day.png</normaloff>:/buttons/icons/previous_day.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -607,7 +607,7 @@ color: black;</string>
             </property>
             <property name="icon">
              <iconset resource="res.qrc">
-              <normaloff>:/done.png</normaloff>:/done.png</iconset>
+              <normaloff>:/markers/icons/done.png</normaloff>:/markers/icons/done.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -649,7 +649,7 @@ color: black;</string>
             </property>
             <property name="icon">
              <iconset resource="res.qrc">
-              <normaloff>:/expected.png</normaloff>:/expected.png</iconset>
+              <normaloff>:/markers/icons/expected.png</normaloff>:/markers/icons/expected.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -688,7 +688,7 @@ color: black;</string>
             </property>
             <property name="icon">
              <iconset resource="res.qrc">
-              <normaloff>:/failed.png</normaloff>:/failed.png</iconset>
+              <normaloff>:/markers/icons/failed.png</normaloff>:/markers/icons/failed.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -729,8 +729,8 @@ color: black;</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>../../Button icons/Next day.png</normaloff>../../Button icons/Next day.png</iconset>
+             <iconset resource="res.qrc">
+              <normaloff>:/buttons/icons/next_day.png</normaloff>:/buttons/icons/next_day.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -810,7 +810,7 @@ color: black;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>843</width>
+     <width>845</width>
      <height>21</height>
     </rect>
    </property>

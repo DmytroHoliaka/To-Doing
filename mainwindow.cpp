@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     customize_list_font("Constantia", 17, 60);
     this->setWindowTitle("ToDoing");
-    this->setWindowIcon(QIcon(":/icon.png"));
+    this->setWindowIcon(QIcon(":/main_icon/icons/icon.png"));
 
     manager.getFile()->getTasksFromFile(&manager, date);
 }
@@ -65,9 +65,9 @@ FileData::FileData()
     task_state.insert("", '1');
     task_state.insert("flag_failed", '0');
 
-    picture.insert('2', "://done.png");
-    picture.insert('1', "://expected.png");
-    picture.insert('0', "://failed.png");
+    picture.insert('2', ":/markers/icons/done.png");
+    picture.insert('1', ":/markers/icons/expected.png");
+    picture.insert('0', ":/markers/icons/failed.png");
 
     flag.insert('2', "flag_done");
     flag.insert('1', "");
@@ -231,7 +231,7 @@ void WidgetManager::on_doneTask_clicked() {      // Done
     QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item){
-        QIcon icon("://done.png");
+        QIcon icon(":/markers/icons/done.png");
         item->setIcon(icon);
 
        item->setData(Qt::UserRole, "flag_done");
@@ -242,7 +242,7 @@ void WidgetManager::on_expectedTask_clicked() {  // Expected
     QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item) {
-        QIcon icon("://expected.png");
+        QIcon icon(":/markers/icons/expected.png");
         item->setIcon(icon);
 
         item->setData(Qt::UserRole, "");
@@ -253,7 +253,7 @@ void WidgetManager::on_failedTask_clicked() {    // Failed
     QListWidgetItem* item = this->thingsList->currentItem();
 
     if(item){
-        QIcon icon("://failed.png");
+        QIcon icon(":/markers/icons/failed.png");
         item->setIcon(icon);
 
         item->setData(Qt::UserRole, "flag_failed");
@@ -265,7 +265,7 @@ void WidgetManager::on_Add_clicked(QListWidget* list)  // Add
     QListWidgetItem* item = new QListWidgetItem(list);
     item->setFlags(item->flags() | Qt::ItemIsEditable);
 
-    QIcon icon("://expected.png");
+    QIcon icon(":/markers/icons/expected.png");
     item->setIcon(QIcon(icon));
 
     list->setCurrentItem(item);                  // встановлюємо активність на елемент
@@ -371,7 +371,7 @@ void Tray::quitFromTray() {
 Tray::Tray()
 {
     tray = new QSystemTrayIcon();
-    tray->setIcon(QIcon("://icon.png"));
+    tray->setIcon(QIcon(":/main_icon/icons/icon.png"));
     tray->setVisible(true);
 
     trayMenu = new QMenu();
