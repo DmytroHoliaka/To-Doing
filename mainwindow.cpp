@@ -58,6 +58,22 @@ void MainWindow::customize_list_font(QString font_name, int size, int block_heig
 
 
 // ------------------- File Data -------------------
+FileData::FileData()
+{
+    basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
+    task_state.insert("flag_done", '2');
+    task_state.insert("", '1');
+    task_state.insert("flag_failed", '0');
+
+    picture.insert('2', "://done.png");
+    picture.insert('1', "://expected.png");
+    picture.insert('0', "://failed.png");
+
+    flag.insert('2', "flag_done");
+    flag.insert('1', "");
+    flag.insert('0', "flag_failed");
+}
+
 void FileData::getTasksFromFile(WidgetManager* manager, Date& date)
 {
     QFile file(this->basePath + date.getCurrentDay() + ".txt");
@@ -109,6 +125,36 @@ void FileData::putTasksIntoFile(WidgetManager* manager, Date& date)
 
 
 // ------------------- Widget Manager -------------------
+WidgetManager::WidgetManager()
+{
+    this->add = nullptr;
+    this->remove = nullptr;
+    this->edit = nullptr;
+    this->next = nullptr;
+    this->previous = nullptr;
+
+    this->file = new FileData;
+    this->thingsList = nullptr;
+}
+
+WidgetManager::WidgetManager(QPushButton* addButton,
+                  QPushButton* removeButton,
+                  QPushButton* editButton,
+                  QPushButton* nextButton,
+                  QPushButton* prevButton,
+                  FileData* file,
+                  QListWidget* thingsList)
+{
+    this->add = addButton;
+    this->remove = removeButton;
+    this->edit = editButton;
+    this->next = nextButton;
+    this->previous = prevButton;
+
+    this->file = file;
+    this->thingsList = thingsList;
+}
+
 WidgetManager::~WidgetManager()
 {
     delete add;
@@ -123,6 +169,63 @@ WidgetManager::~WidgetManager()
     delete file;
     delete thingsList;
 }
+
+
+QListWidget* WidgetManager::getThingsList()
+{
+    return this->thingsList;
+}
+
+FileData* WidgetManager::getFile()
+{
+    return this->file;
+}
+
+void WidgetManager::setAdd(QPushButton* addButton)
+{
+    this->add = addButton;
+}
+
+void WidgetManager::setRemove(QPushButton* removeButton)
+{
+    this->remove = removeButton;
+}
+
+void WidgetManager::setEdit(QPushButton* editButton)
+{
+    this->edit = editButton;
+}
+
+void WidgetManager::setThingsList(QListWidget* thingsList)
+{
+    this->thingsList = thingsList;
+}
+
+void WidgetManager::setDone(QPushButton* doneButton)
+{
+    this->done = doneButton;
+}
+
+void WidgetManager::setExpected(QPushButton* expectedButton)
+{
+    this->expected = expectedButton;
+}
+
+void WidgetManager::setFailed(QPushButton* failedButton)
+{
+    this->failed = failedButton;
+}
+
+void WidgetManager::setNext(QPushButton* nextButton)
+{
+    this->next = nextButton;
+}
+
+void WidgetManager::setPrevious(QPushButton* previousButton)
+{
+    this->previous = previousButton;
+}
+
 
 void WidgetManager::on_doneTask_clicked() {      // Done
     QListWidgetItem* item = this->thingsList->currentItem();
@@ -265,18 +368,39 @@ void Tray::quitFromTray() {
     QApplication::quit();
 }
 
+Tray::Tray()
+{
+    tray = new QSystemTrayIcon();
+    tray->setIcon(QIcon("://icon.png"));
+    tray->setVisible(true);
+
+    trayMenu = new QMenu();
+    trayOpen = trayMenu->addAction("Open");
+    trayQuit = trayMenu->addAction("Quit");
+
+    tray->setContextMenu(trayMenu);
+}
+
+Tray::~Tray()
+{
+    delete tray;
+    delete trayOpen;
+    delete trayQuit;
+    delete trayMenu;
+}
+
+void Tray::makeConections(MainWindow* mw)
+{
+    QObject::connect(trayOpen, &QAction::triggered, this, [this, mw]() {
+        this->openFromTray(mw);
+    });
+    QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
+}
 
 
 
 
 // ------------------- Top Panel -------------------
-
-TopPanel::~TopPanel()
-{
-    delete exit;
-    delete top;
-    delete reset;
-}
 
 void TopPanel::menuAlways_on_top(MainWindow* mw) {
     mw->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint); // закріплення вікна
@@ -289,12 +413,64 @@ void TopPanel::menuReset_to_default(MainWindow* mw) {
 }
 
 
+TopPanel::TopPanel()
+{
+    this->exit = nullptr;
+    this->top = nullptr;
+    this->reset = nullptr;
+}
+
+TopPanel::TopPanel(QAction* exitMenu, QAction* topMenu, QAction* resetMenu)
+{
+    this->exit = exitMenu;
+    this->top = topMenu;
+    this->reset = resetMenu;
+}
+
+TopPanel::~TopPanel()
+{
+    delete exit;
+    delete top;
+    delete reset;
+}
+
+void TopPanel::setExit(QAction* exitMenu)
+{
+    this->exit = exitMenu;
+}
+
+void TopPanel::setTop(QAction* topMenu)
+{
+    this->top = topMenu;
+}
+
+void TopPanel::setReset(QAction* resetMenu)
+{
+    this->reset = resetMenu;
+}
+
+void TopPanel::makeConections(MainWindow* mw)
+{
+    QObject::connect(this->exit, &QAction::triggered, this, [](){
+         QApplication::quit();
+    });
+
+    QObject::connect(this->top, &QAction::triggered, this, [this, mw](){
+        this->menuAlways_on_top(mw);
+    });
+    QObject::connect(this->reset, &QAction::triggered, this, [this, mw](){
+        this->menuReset_to_default(mw);
+    });
+}
 
 
 // ------------------- Date -------------------
-void Date::print()
+Date::Date()
 {
-    this->dateLabel->setText(this->space + "  " + this->currentDay + "  " + this->space);
+    this->daysCounter = 0;
+    this->space = "----------------------";
+    this->currentDay = this->get_date();
+    this->dateLabel = nullptr;
 }
 
 Date::~Date()
@@ -302,5 +478,71 @@ Date::~Date()
     delete dateLabel;
 }
 
+void Date::print()
+{
+    this->dateLabel->setText(this->space + "  " + this->currentDay + "  " + this->space);
+}
 
+void Date::recount()
+{
+    this->currentDay = this->get_date();
+}
+
+
+QString Date::get_date() {
+    return QDate::currentDate().addDays(this->daysCounter).toString("dd.MM.yyyy");
+}
+
+int Date::getDaysCounter()
+{
+    return this->daysCounter;
+}
+
+QString Date::getCurrentDay()
+{
+    return this->currentDay;
+}
+
+QLabel* Date::getDateLabel()
+{
+    return this->dateLabel;
+}
+
+
+void Date::setDaysCounter(int count)
+{
+    this->daysCounter = count;
+}
+
+void Date::setDateLabel(QLabel* dateLabel)
+{
+    this->dateLabel = dateLabel;
+}
+
+
+Date* Date::operator++()
+{
+    ++this->daysCounter;
+    return this;
+}
+
+Date* Date::operator--()
+{
+    --this->daysCounter;
+     return this;
+}
+
+Date* Date::operator++(int)
+{
+    Date temp = *this;
+    ++this->daysCounter;
+    return this;
+}
+
+Date* Date::operator--(int)
+{
+    Date temp = *this;
+    --this->daysCounter;
+    return this;
+}
 

@@ -46,35 +46,12 @@ private slots:
     void openFromTray(MainWindow*);
 
 public:
-    Tray()
-    {
-        tray = new QSystemTrayIcon();
-        tray->setIcon(QIcon("://icon.png"));
-        tray->setVisible(true);
-
-        trayMenu = new QMenu();
-        trayOpen = trayMenu->addAction("Open");
-        trayQuit = trayMenu->addAction("Quit");
-
-        tray->setContextMenu(trayMenu);
-    }
-
-    ~Tray()
-    {
-        delete tray;
-        delete trayOpen;
-        delete trayQuit;
-        delete trayMenu;
-    }
-
-    void makeConections(MainWindow* mw)
-    {
-        QObject::connect(trayOpen, &QAction::triggered, this, [this, mw]() {
-            this->openFromTray(mw);
-        });
-        QObject::connect(trayQuit, &QAction::triggered, this, &Tray::quitFromTray);
-    }
+    Tray();
+    ~Tray();
+    void makeConections(MainWindow*);
 };
+
+
 
 class TopPanel : public QObject
 {
@@ -86,60 +63,24 @@ private:
     QAction* reset;
 
 private slots:
-    void menuAlways_on_top(MainWindow* mw);
-
-    void menuReset_to_default(MainWindow* mw);
+    void menuAlways_on_top(MainWindow*);
+    void menuReset_to_default(MainWindow*);
 
 public:
-    TopPanel()
-    {
-        this->exit = nullptr;
-        this->top = nullptr;
-        this->reset = nullptr;
-    }
-
-    TopPanel(QAction* exitMenu, QAction* topMenu, QAction* resetMenu)
-    {
-        this->exit = exitMenu;
-        this->top = topMenu;
-        this->reset = resetMenu;
-    }
-
+    TopPanel();
+    TopPanel(QAction*, QAction*, QAction*);
     ~TopPanel();
 
-    void setExit(QAction* exitMenu)
-    {
-        this->exit = exitMenu;
-    }
-
-    void setTop(QAction* topMenu)
-    {
-        this->top = topMenu;
-    }
-
-    void setReset(QAction* resetMenu)
-    {
-        this->reset = resetMenu;
-    }
-
-    void makeConections(MainWindow* mw)
-    {
-        QObject::connect(this->exit, &QAction::triggered, this, [](){
-             QApplication::quit();
-        });
-
-        QObject::connect(this->top, &QAction::triggered, this, [this, mw](){
-            this->menuAlways_on_top(mw);
-        });
-        QObject::connect(this->reset, &QAction::triggered, this, [this, mw](){
-            this->menuReset_to_default(mw);
-        });
-    }
+    void setExit(QAction*);
+    void setTop(QAction*);
+    void setReset(QAction*);
+    void makeConections(MainWindow*);
 };
+
+
 
 class Date
 {
-    friend class MainWindow;
 private:
     int daysCounter;
     QString currentDay;
@@ -147,79 +88,27 @@ private:
     QLabel* dateLabel;
 
 public:
-    Date()
-    {
-        this->daysCounter = 0;
-        this->space = "----------------------";
-        this->currentDay = this->get_date();
-        this->dateLabel = nullptr;
-    }
-
+    Date();
     ~Date();
+
     void print();
-    void recount()
-    {
-        this->currentDay = this->get_date();
-    }
+    void recount();
 
+    QString get_date();
+    int getDaysCounter();
+    QString getCurrentDay();
+    QLabel* getDateLabel();
 
-    QString get_date() {
-        return QDate::currentDate().addDays(this->daysCounter).toString("dd.MM.yyyy");
-    }
+    void setDaysCounter(int);
+    void setDateLabel(QLabel*);
 
-    int getDaysCounter()
-    {
-        return this->daysCounter;
-    }
-
-    QString getCurrentDay()
-    {
-        return this->currentDay;
-    }
-
-    QLabel* getDateLabel()
-    {
-        return this->dateLabel;
-    }
-
-
-    void setDaysCounter(int count)
-    {
-        this->daysCounter = count;
-    }
-
-    void setDateLabel(QLabel* dateLabel)
-    {
-        this->dateLabel = dateLabel;
-    }
-
-
-    Date* operator++()
-    {
-        ++this->daysCounter;
-        return this;
-    }
-
-    Date* operator--()
-    {
-        --this->daysCounter;
-         return this;
-    }
-
-    Date* operator++(int)
-    {
-        Date temp = *this;
-        ++this->daysCounter;
-        return this;
-    }
-
-    Date* operator--(int)
-    {
-        Date temp = *this;
-        --this->daysCounter;
-        return this;
-    }
+    Date* operator++();
+    Date* operator--();
+    Date* operator++(int);
+    Date* operator--(int);
 };
+
+
 
 class FileData
 {
@@ -230,27 +119,15 @@ private:
     QMap<QChar, QString> flag;
 
 public:
-    FileData()
-    {
-        basePath = QCoreApplication::applicationDirPath() + "\\tasks_base\\";
-        task_state.insert("flag_done", '2');
-        task_state.insert("", '1');
-        task_state.insert("flag_failed", '0');
+    FileData();
 
-        picture.insert('2', "://done.png");
-        picture.insert('1', "://expected.png");
-        picture.insert('0', "://failed.png");
-
-        flag.insert('2', "flag_done");
-        flag.insert('1', "");
-        flag.insert('0', "flag_failed");
-    }
-
-    void getTasksFromFile(WidgetManager* manager, Date& date);
-    void putTasksIntoFile(WidgetManager* manager, Date& date);
+    void getTasksFromFile(WidgetManager*, Date&);
+    void putTasksIntoFile(WidgetManager*, Date&);
 };
 
-class WidgetManager : public QObject    // Todo: Перейменуй, можливо WingetManager
+
+
+class WidgetManager : public QObject
 {
 private:
     QPushButton* add;
@@ -266,109 +143,43 @@ private:
     QListWidget* thingsList;
 
 
-
 public:
-    WidgetManager()
-    {
-        this->add = nullptr;
-        this->remove = nullptr;
-        this->edit = nullptr;
-        this->next = nullptr;
-        this->previous = nullptr;
-
-        this->file = new FileData;
-        this->thingsList = nullptr;
-    }
-
-    WidgetManager(QPushButton* addButton,
-                      QPushButton* removeButton,
-                      QPushButton* editButton,
-                      QPushButton* nextButton,
-                      QPushButton* prevButton,
-                      FileData* file,
-                      QListWidget* thingsList)
-    {
-        this->add = addButton;
-        this->remove = removeButton;
-        this->edit = editButton;
-        this->next = nextButton;
-        this->previous = prevButton;
-
-        this->file = file;
-        this->thingsList = thingsList;
-    }
-
+    WidgetManager();
+    WidgetManager(QPushButton*,
+                      QPushButton*,
+                      QPushButton*,
+                      QPushButton*,
+                      QPushButton*,
+                      FileData*,
+                      QListWidget*);
     ~WidgetManager();
 
-    QListWidget* getThingsList()
-    {
-        return this->thingsList;
-    }
+    QListWidget* getThingsList();
+    FileData* getFile();
 
-    FileData* getFile()
-    {
-        return this->file;
-    }
+    void setAdd(QPushButton*);
+    void setRemove(QPushButton*);
+    void setEdit(QPushButton*);
+    void setThingsList(QListWidget*);
+    void setDone(QPushButton*);
+    void setExpected(QPushButton*);
+    void setFailed(QPushButton*);
+    void setNext(QPushButton*);
+    void setPrevious(QPushButton*);
 
-    void setAdd(QPushButton* addButton)
-    {
-        this->add = addButton;
-    }
-
-    void setRemove(QPushButton* removeButton)
-    {
-        this->remove = removeButton;
-    }
-
-    void setEdit(QPushButton* editButton)
-    {
-        this->edit = editButton;
-    }
-
-    void setThingsList(QListWidget* thingsList)
-    {
-        this->thingsList = thingsList;
-    }
-
-    void setDone(QPushButton* doneButton)
-    {
-        this->done = doneButton;
-    }
-
-    void setExpected(QPushButton* expectedButton)
-    {
-        this->expected = expectedButton;
-    }
-
-    void setFailed(QPushButton* failedButton)
-    {
-        this->failed = failedButton;
-    }
-
-    void setNext(QPushButton* nextButton)
-    {
-        this->next = nextButton;
-    }
-
-    void setPrevious(QPushButton* previousButton)
-    {
-        this->previous = previousButton;
-    }
-
-
-    void makeConections(Date& date);
+    void makeConections(Date&);
     void afterChanged(QListWidgetItem*);
 
-
-    void on_Add_clicked(QListWidget* list);
-    void on_Edit_clicked(QListWidget* list);
-    void on_Remove_clicked(QListWidget* list);
+    void on_Add_clicked(QListWidget*);
+    void on_Edit_clicked(QListWidget*);
+    void on_Remove_clicked(QListWidget*);
     void on_doneTask_clicked();
     void on_expectedTask_clicked();
     void on_failedTask_clicked();
-    void on_previousDay_clicked(Date& date);
-    void on_nextDay_clicked(Date& date);
+    void on_previousDay_clicked(Date&);
+    void on_nextDay_clicked(Date&);
 };
+
 
 
 class MainWindow : public QMainWindow
@@ -381,11 +192,10 @@ private:
     Date date;
     WidgetManager manager;
 
-
     Ui::MainWindow *ui;
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget* = nullptr);
     ~MainWindow();
 
     void customize_list_font(QString, int, int);
