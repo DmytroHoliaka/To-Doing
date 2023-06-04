@@ -1,4 +1,5 @@
-#include "mainwindow.h"
+#include "header.h"
+#include "app.h"
 #include "ui_mainwindow.h"
 
 // ------------------- Main Window -------------------
@@ -78,21 +79,41 @@ void FileData::getTasksFromFile(WidgetManager* manager, Date& date)
 {
     char state;
     std::string tempLine;
+    std::vector<std::string> errors;
+
     std::ifstream input(this->basePath.toStdString() + date.getCurrentDay().toStdString() + ".txt");
     if (input.is_open())
     {
         while(input >> state)
         {
-            std::getline(input, tempLine);
-            QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(tempLine), manager->getThingsList());
-            manager->getThingsList()->addItem(item);
-            item->setFlags(item->flags() | Qt::ItemIsEditable);
+            if (state == '0' || state == '1' || state == '2')
+            {
+                std::getline(input, tempLine);
+                QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(tempLine), manager->getThingsList());
+                manager->getThingsList()->addItem(item);
+                item->setFlags(item->flags() | Qt::ItemIsEditable);
 
-            QIcon icon(picture[state]);
-            item->setIcon(icon);
+                QIcon icon(picture[state]);
+                item->setIcon(icon);
 
-            item->setData(Qt::UserRole, flag[state]);
+                item->setData(Qt::UserRole, flag[state]);
+            }
+            else
+            {
+                std::cout << "Add error" << std::endl;
+                std::getline(input, tempLine);
+                errors.push_back(state + tempLine);
+            }
         }
+    }
+
+    if (errors.size() > 0)
+    {
+        std::cout << "------------ Errors in file " << date.getCurrentDay().toStdString() << ".txt ------------ " << std::endl;
+        std::cout << "[Next line is incorect]:" << std::endl;
+        for (size_t i = 0; i < errors.size(); ++i)
+            std::cout << errors[i] << std::endl;
+        std::cout << "-----------------------------------" << std::endl;
     }
 
     input.close();
@@ -299,6 +320,13 @@ void WidgetManager::afterChanged(QListWidgetItem* tempItem)
     if(tempItem != nullptr && tempItem->isSelected() && tempItem->text().isEmpty()){
         delete tempItem;
     }
+}
+
+bool Application::notify(QObject *receiver, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(event)->key() == Qt::Key_Escape)
+        return true;
+    return QApplication::notify(receiver, event);
 }
 
 void WidgetManager::makeConections(Date& date)

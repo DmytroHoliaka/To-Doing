@@ -1,7 +1,6 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef HEADER_H
+#define HEADER_H
 
-#include <QApplication>
 #include <QMainWindow>
 #include <QDate>
 #include <QMainWindow>
@@ -24,6 +23,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <iostream>
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -208,4 +208,4 @@ protected:
     void closeEvent(QCloseEvent*) override;
 };
 
-#endif // MAINWINDOW_H
+#endif // HEADER_H
